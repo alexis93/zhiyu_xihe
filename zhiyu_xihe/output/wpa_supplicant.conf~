@@ -1,0 +1,53 @@
+ctrl_interface=wlan0
+update_config=1
+device_name=full_tiny4412
+manufacturer=FriendlyARM (www.arm9.net)
+model_name=Full Android on TINY4412
+model_number=Full Android on TINY4412
+serial_number=
+device_type=10-0050F204-5
+config_methods=physical_display virtual_push_button keypad
+
+network={
+	ssid="Xiaomi_F7B4"
+	psk="1234567890"
+	key_mgmt=WPA-PSK
+	priority=4
+}
+
+network={
+	ssid="zhiyuAP01"
+	psk="1234567890"
+	key_mgmt=WPA-PSK
+	priority=5
+}
+
+network={                 
+	ssid="zhiyuAP02"  
+	psk="1234567890"  
+	key_mgmt=WPA-PSK
+	priority=3      
+} 
+
+network={
+	ssid="Xiaomi_B996"
+	psk="19740903"
+	key_mgmt=WPA-PSK
+	priority=2
+}
+
+network={
+        ssid="GNSS_floor11_2#"
+        psk="gnsslbs_guo"
+        key_mgmt=WPA-PSK
+        priority=6
+}
+
+network={
+        ssid="gnss3"
+        psk="gnss1234"
+        key_mgmt=WPA-PSK
+        priority=7
+}
+
+                                

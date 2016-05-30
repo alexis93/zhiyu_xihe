@@ -1,0 +1,497 @@
+/*-----------------------------------------------------------------
+ *	iwise_nmea_parser.c :
+ *
+ *	Copyright (C) 2014-2015 by iwise. All rights reserved.
+ *
+ * 	version	:
+ * 	history	: 	2015-05-18	created by chenxi
+ * 				2015-06-12	add notes and comments by lanzhigang
+ *-------------------------------------------------------------------*/
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include "Parserlib/rtklib.h"
+#include "iwise_nmea_parser.h"
+#include "iwise_loc_log.h"
+
+#define FIELD_SIZ		32
+#define MAX_NMEA_BUF 	102
+const char Fields[32][FIELD_SIZ];
+
+struct sv_info_t *tmp;
+int k 	= 0;
+int k1 	= 0;
+int k2 	= 0;
+
+/* nmea 错误函数 */
+/*
+ *	参数		:	int error		I		错误编号
+ * 	返回		:	void
+ * 	描述		:	设置错误编号
+ * 	历史		:
+ * 	备注		: 
+ */
+void set_last_error(int error) 
+{
+	last_error = error;
+}
+
+/*
+ *	参数		:	void
+ * 	返回		:	void
+ * 	描述		:	获得错误编号
+ * 	历史		:
+ * 	备注		: 
+ */
+int get_last_error(void) 
+{
+	return last_error;
+}
+
+/*
+ *	参数		:	int error		I		错误编号
+ * 	返回		:	char *
+ * 	描述		:	获得错误编号的字符串
+ * 	历史		:
+ * 	备注		: 
+ */
+char *get_error_string(int error) 
+{
+	return NULL;
+}
+
+/*转换经纬度---------------------------------------*/
+static double __convert_lat_lon(double latlon) 
+{
+	int deg;
+	double min;
+
+	deg = (int) latlon / 100;
+	min = latlon - (deg * 100);
+	return (min / 60 + deg);
+}
+
+// TODO 时间函数的日期不能使用默认的
+static GpsUtcTime _iwise_position_utc(char utc[]) 
+{
+	struct tm *tm;
+	time_t now;
+	now = time(NULL);
+	tm = gmtime(&now);
+	tm->tm_sec = (utc[4] - '0') * 10 + (utc[5] - '0');
+	tm->tm_min = (utc[3] - '0') * 10 + (utc[3] - '0');
+	tm->tm_hour = (utc[0] - '0') * 10 + (utc[0] - '0');
+	return (GpsUtcTime) mktime(tm) * 1000;
+}
+
+/* 上报nmea------------------------------------------------------*/
+static int report_nmea(iwise_nmea_parser_t *nmea) 
+{
+	if ((nmea->gga_type == NMEA_GGA) && (nmea->gsv_type == NMEA_GSV)
+			&& (nmea->NoMsg == nmea->MsgNo)) {
+		k++;
+		nmea->gsv_type = 0;
+		nmea->gga_type = 0;
+		return 1;
+	} else if ((nmea->gga_type == NMEA_GGA) && (nmea->gga_count != 0)) {
+		nmea->gga_count = 0;
+	} else if ((nmea->gsv_type == NMEA_GSV) && (nmea->MsgNo != 0)) {
+	
+	}
+
+	return 0;
+}
+
+/* nmea校验-------------------------------------------------------*/
+static unsigned char nmea_checksum(const char *nmea_buf) 
+{
+	unsigned char sum = 0;
+	char c;
+	const char *p = nmea_buf;
+
+	if (*p == '$')
+		p++;
+	while (((c = *p) != '*') && (c != '\0')) {
+		sum ^= c;
+		p++;
+	}
+
+	return sum;
+}
+
+/* 分离nmea字段-------------------------------------------------------*/
+static int extract_nmea_field(const char *nmea_buf, char *fields[]) 
+{
+	int i, j;
+	const char *p = nmea_buf;
+	char (*fieldp)[FIELD_SIZ] = (char (*)[FIELD_SIZ]) fields;
+
+	i = 0;
+	for (;;) {
+		for (j = 0; *p != ',' && *p != '*' && *p != '\0'; p++) {
+			fieldp[i][j] = *p;
+			j++;
+			if (*p == '\n')
+				break;
+		}
+		fieldp[i++][j] = '\0';
+		if (*p == '\0' || *p == '\n')
+			break;
+		p++;
+	}
+	//(*fieldp)[i] = 0;
+	return i;
+}
+
+/* 解析GST-------------------------------------------------------*/
+static int processGPGST(int count, const char field[][FIELD_SIZ],
+		iwise_nmea_parser_t* nmea_info) 
+{
+	char (*fieldp)[FIELD_SIZ] = (char (*)[FIELD_SIZ]) field;
+
+	memcpy(nmea_info->nmea_gst_info.utc, fieldp[1], 10);
+
+	nmea_info->nmea_gst_info.range_rms = atof(fieldp[2]);
+	nmea_info->nmea_gst_info.std_major = atof(fieldp[3]);
+	nmea_info->nmea_gst_info.std_minor = atof(fieldp[4]);
+	nmea_info->nmea_gst_info.hdg = atof(fieldp[5]);
+	nmea_info->nmea_gst_info.std_lat = atof(fieldp[6]);
+	nmea_info->nmea_gst_info.std_long = atof(fieldp[7]);
+	nmea_info->nmea_gst_info.std_alt = atof(fieldp[8]);
+	return NMEA_TYPE_GST;
+}
+
+
+/* 单位进制的转换 米每秒  与 节  1节约等于0.5144m/s*/
+static double knot2ms(double knot) 
+{
+	double ms = knot * 0.51444;
+	//GPS_LOGD(" knot= %lf  ms = %lf \n", knot,ms );
+	return ms;
+}
+
+/* 单位进制的转换 千米每小时  与 节  1节约等于1.852km/h*/
+static double knot2kmh(double knot) 
+{
+	double kmh = knot * 1.852;
+	//GPS_LOGD(" knot= %lf  kmh = %lf \n", knot,kmh );
+	return kmh;
+}
+
+/* 解析RMC-------------------------------------------------------*/
+static int processGPRMC(int count, const char field[][FIELD_SIZ],
+		iwise_nmea_parser_t* nmea_info) 
+{
+	char (*fieldp)[FIELD_SIZ] = (char (*)[FIELD_SIZ]) field;
+	switch (*fieldp[2]) {
+	case 'V':
+		nmea_info->nmea_rmc_info.status = FIX_STATUS_INVALID; //定位无效
+		break;
+	case 'A':
+		nmea_info->nmea_rmc_info.status = FIX_STATUS_VALID; //定位有效
+		break;
+	default:
+		nmea_info->nmea_rmc_info.status = FIX_STATUS_INVALID; //定位无效
+		break;
+	}
+
+	switch (*fieldp[12]) {
+	case 'N':
+		nmea_info->nmea_rmc_info.mode = FIX_STATUS_INVALID;
+		break;
+	case 'A':
+		nmea_info->nmea_rmc_info.mode = FIX_STATUS_AUTO;
+		break;
+	case 'D':
+		nmea_info->nmea_rmc_info.mode = FIX_STATUS_DGPS_SPS;
+		break;
+	case 'E':
+		nmea_info->nmea_rmc_info.mode = FIX_STATUS_ESTIMATE_DEAD_ROCKONING;
+		break;
+	default:
+		nmea_info->nmea_rmc_info.mode = FIX_STATUS_INVALID;
+		break;
+	}
+
+	if ((nmea_info->nmea_rmc_info.status == FIX_STATUS_INVALID)
+			|| (nmea_info->nmea_rmc_info.mode == FIX_STATUS_INVALID)) {
+		//GPS_LOGD("status %c  mode  %c \n",*fieldp[2], *fieldp[12] );
+		return NMEA_TYPE_ERROR; //当定位无效时，就返回-1；
+	}
+	//时间的转换在这里就完成了
+	nmea_info->nmea_rmc_info.utc = _iwise_position_utc(fieldp[1]);
+	//memcpy(nmea_info->nmea_rmc_info.utc, fieldp[1], 10);
+
+	nmea_info->nmea_rmc_info.latitude = __convert_lat_lon(atof(fieldp[3]));
+	nmea_info->nmea_rmc_info.NS_ind = *fieldp[4];
+	nmea_info->nmea_rmc_info.longitude = __convert_lat_lon(atof(fieldp[5]));
+	nmea_info->nmea_rmc_info.EW_ind = *fieldp[6];
+
+	nmea_info->nmea_rmc_info.speed = knot2kmh(atof(fieldp[7]));
+	nmea_info->nmea_rmc_info.bearing = atof(fieldp[8]);
+
+	memcpy(nmea_info->nmea_rmc_info.data, fieldp[9], 6);
+	nmea_info->nmea_rmc_info.declination = atof(fieldp[10]);
+	nmea_info->nmea_rmc_info.declination_EW = *fieldp[11];
+
+	return NMEA_TYPE_RMC; //GPRMC 解算成功
+}
+
+/* 解析GGA-------------------------------------------------------*/
+static int processGPGGA(int count, const char field[][FIELD_SIZ],
+		iwise_nmea_parser_t* nmea_info) 
+{
+	char (*fieldp)[FIELD_SIZ] = (char (*)[FIELD_SIZ]) field;
+	switch (*fieldp[6]) {
+	case '0':
+		nmea_info->nmea_gga_info.fix_status = FIX_STATUS_INVALID;
+		break;
+	case '1':
+		nmea_info->nmea_gga_info.fix_status = FIX_STATUS_GPS_SPS;
+		break;
+	case '2':
+		nmea_info->nmea_gga_info.fix_status = FIX_STATUS_DGPS_SPS;
+		break;
+	case '4':
+		nmea_info->nmea_gga_info.fix_status = FIX_STATUS_DGPS_SPS;
+		break;
+	case '5':
+			nmea_info->nmea_gga_info.fix_status = FIX_STATUS_DGPS_SPS;
+			break;
+	case '6':
+		nmea_info->nmea_gga_info.fix_status =
+				FIX_STATUS_ESTIMATE_DEAD_ROCKONING;
+		break;
+	case '8':
+		nmea_info->nmea_gga_info.fix_status = FIX_STATUS_DGPS_SPS;
+		break;
+	default:
+		nmea_info->nmea_gga_info.fix_status = FIX_STATUS_INVALID;
+	}
+
+	nmea_info->nmea_report_info.nmea_type |= NMEA_GGA;
+	nmea_info->nmea_report_info.nmea_msg_length = strlen(
+			nmea_info->nmea_report_info.nmea_msg);
+	//GPS_LOGD("GNGGA:  %c",nmea_info->nmea_gga_info.fix_status);
+	if (nmea_info->nmea_gga_info.fix_status == FIX_STATUS_INVALID) {
+		report_nmea(nmea_info);
+		set_last_error(ENMEA_GGA_INVALID);
+		k1++;
+		return NMEA_TYPE_ERROR;
+	}
+	// TODO 时间的转换在这里就完成了
+	nmea_info->nmea_gga_info.utc = _iwise_position_utc(fieldp[1]);
+	//memcpy(nmea_info->nmea_gga_info.utc, fieldp[1], 10);
+	nmea_info->nmea_gga_info.latitude = atof(fieldp[2]);
+	nmea_info->nmea_gga_info.NS_ind = *fieldp[3];
+	nmea_info->nmea_gga_info.longitude = atof(fieldp[4]);
+	nmea_info->nmea_gga_info.EW_ind = *fieldp[5];
+	nmea_info->nmea_gga_info.sv_used = atoi(fieldp[7]);
+
+	if (*fieldp[9] != 0) {
+		nmea_info->nmea_gga_info.altitude = atof(fieldp[9]);
+	}
+	nmea_info->gga_type = NMEA_GGA;
+	nmea_info->gga_count = 1;
+	GPS_LOGD("----------%c: %07.10f %c %07.10f  %d \n",
+			nmea_info->nmea_gga_info.NS_ind, nmea_info->nmea_gga_info.latitude,
+			nmea_info->nmea_gga_info.EW_ind, nmea_info->nmea_gga_info.longitude,
+			nmea_info->nmea_gga_info.sv_used);
+	return NMEA_TYPE_GGA;
+}
+
+/* 解析GSV-------------------------------------------------------*/
+static int processGPGSV(int count, const char field[][FIELD_SIZ],
+		iwise_nmea_parser_t *nmea_info) 
+{
+	char (*fieldp)[FIELD_SIZ] = (char (*)[FIELD_SIZ]) field;
+	static int sv_info_count = 0;
+	int temp, i;
+
+	nmea_info->nmea_gsv_info.sv_in_view = atoi(fieldp[3]);
+
+	//TODO
+	nmea_info->nmea_report_info.nmea_type = NMEA_GSV;
+	nmea_info->nmea_report_info.nmea_msg_length = strlen(
+			nmea_info->nmea_report_info.nmea_msg);
+
+	temp = atoi(fieldp[1]);
+	if (temp == 0 || (nmea_info->NoMsg != 0 && temp != nmea_info->NoMsg)) {
+		report_nmea(nmea_info);
+		set_last_error(ENMEA_GSV_MSG_MISSING);
+		return NMEA_TYPE_ERROR;
+	}
+	if (nmea_info->NoMsg == 0)
+		nmea_info->NoMsg = temp;
+	temp = atoi(fieldp[2]);
+	if (temp != (nmea_info->MsgNo + 1)) {
+		nmea_info->MsgNo = 0;
+		sv_info_count = 0;
+		report_nmea(nmea_info);
+		set_last_error(ENMEA_GSV_MSG_MISSING);
+		k2++;
+		return NMEA_TYPE_ERROR;
+	}
+	nmea_info->MsgNo = temp;
+
+	for (i = 0; sv_info_count < nmea_info->nmea_gsv_info.sv_in_view; i += 4) {
+		if (*fieldp[i + 4]) {
+			nmea_info->nmea_gsv_info.sv_info[sv_info_count].sv =
+					(unsigned char) atoi(fieldp[i + 4]);
+			if (*fieldp[i + 5])
+				nmea_info->nmea_gsv_info.sv_info[sv_info_count].elevation =
+						(unsigned char) atoi(fieldp[i + 5]);
+			if (*fieldp[i + 6])
+				nmea_info->nmea_gsv_info.sv_info[sv_info_count].azimuth =
+						(unsigned short) atoi(fieldp[i + 6]);
+			if (*fieldp[i + 7])
+				nmea_info->nmea_gsv_info.sv_info[sv_info_count].CNo =
+						(unsigned char) atoi(fieldp[i + 7]);
+			sv_info_count++;
+		} else
+			break;
+	}
+	nmea_info->gsv_type = NMEA_GSV;
+	if (nmea_info->MsgNo == nmea_info->NoMsg) {
+		if (sv_info_count == nmea_info->nmea_gsv_info.sv_in_view) {
+			sv_info_count = 0;
+			nmea_info->NoMsg = 0;
+			nmea_info->MsgNo = 0;
+			return NMEA_TYPE_GSV;
+		} else {
+			return NMEA_TYPE_ERROR;
+		}
+	}
+
+	return NMEA_TYPE_GSV_PART;
+}
+
+
+
+/* parse_nmea 返回值
+ * 信息       成功返回值    失败返回值     没有解算完
+ * GPRMC      13              -2
+ * GPGGA      10              -2
+ * GPGST      11              -2        
+ * GPGSV      12              -2         21
+* */
+//no message is the buffer break
+
+static int parse_nmea(iwise_nmea_parser_t *nmea) 
+{
+	int count = 0;
+	char checksum[6];
+	
+	count = extract_nmea_field(nmea->nmea_report_info.nmea_msg,
+			(char **) Fields);
+	if (count <= 0) {
+		set_last_error(ENMEA_EXTRACT_FIELD);
+		GPS_LOGE("NMEA count <= 0!");
+		return NMEA_TYPE_ERROR;
+	}
+	if (*Fields[0] != '$') {
+		set_last_error(ENMEA_HEAD);
+		//GPS_LOGE("NMEA Fields[0] != '$'");
+		return NMEA_TYPE_ERROR;
+	}
+	snprintf(checksum, 5, "%02X\r\n",
+			nmea_checksum(nmea->nmea_report_info.nmea_msg));
+
+	if (strncmp(Fields[count - 1], checksum, 4) != 0) {
+		set_last_error(ENMEA_CHECKSUM);
+		GPS_LOGE("NMEA checksum !=0");
+		return NMEA_TYPE_ERROR;
+	}
+
+	//printf("[NMEA]%s", nmea->nmea_report_info.nmea_msg);
+	GPS_LOGE("Fields[0]:%s",Fields[0]);
+	if ((strncmp(Fields[0], "$GPGGA", 6) == 0)||(strncmp(Fields[0], "$GNGGA", 6) == 0)) {
+		//nmea->nmea_report_info.nmea_msg[2]='P';
+		printf("[NMEA]%s", nmea->nmea_report_info.nmea_msg);
+		return processGPGGA(count, Fields, nmea);
+	} else if (strncmp(Fields[0], "$GPGSV", 6) == 0) {
+		return processGPGSV(count, Fields, nmea);
+	} else if (strncmp(Fields[0], "$GPGST", 6) == 0) {
+		return processGPGST(count, Fields, nmea);
+	} else if (strncmp(Fields[0], "$GPRMC", 6) == 0) {
+		return processGPRMC(count, Fields, nmea);
+	}
+	//printf("[NMEA]%s", nmea->nmea_report_info.nmea_msg);
+	return NMEA_TYPE_ERROR;
+}
+
+
+ /*
+ *	参数		:	iwise_nmea_parser_t *nmea_info		I		nmea解析器数据数据存储结构
+ * 	返回		:	int	-2:解析nmea失败	10：解析GGA成功	11：解析GST成功		12：解析GSV成功
+ * 					13：解析RMC成功	21：解析成功了部分GSV
+ * 	描述		:	nmea解析器的输入
+ * 	历史		:
+ * 	备注		: 
+ */
+int iwise_nmea_parser_input(iwise_nmea_parser_t *nmea, unsigned char buf) 
+{
+	static int i = 0;
+	int ret = 0;
+	if (buf != '\n') {
+		(nmea->nmea_report_info.nmea_msg)[i] = buf;
+		i++;
+		//GPS_LOGD("ret=%d, buf=%d, bf=%c, \n",ret,buf,buf);
+	} else {
+		//GPS_LOGD("get one \n");
+		(nmea->nmea_report_info.nmea_msg)[i] = buf;
+		(nmea->nmea_report_info.nmea_msg)[i+1] = 0;
+		ret = parse_nmea(nmea);
+		if (ret==10) GPS_LOGD("[NMEA]%s", nmea->nmea_report_info.nmea_msg);
+
+		//GPS_LOGD("[RETURN]%d", ret);
+		i = 0;
+		return ret;
+	}
+
+	return 0;
+}
+
+/*
+ *	参数		:	iwise_serial_parser_t* parser		I		解析器数据数据存储结构
+ * 	返回		:	int		-1:初始化失败		0：初始化成功
+ * 	描述		:	初始化nmea解析器
+ * 	历史		:
+ * 	备注		: 
+ */
+int iwise_nmea_parser_init(iwise_nmea_parser_t *nmea_info)
+{
+	nmea_info->gga_type = 0;
+	nmea_info->gsv_type = 0;
+	nmea_info->gga_count = 0;
+
+	nmea_info->MsgNo = 0;
+	nmea_info->NoMsg = 0;
+
+	struct sv_info_t *sv;
+	sv = (struct sv_info_t *) calloc(GPS_MAX_SVS, sizeof(struct sv_info_t));
+	tmp = (struct sv_info_t *) &(nmea_info->nmea_gsv_info.sv_info);
+	if ((tmp = sv) == NULL) {
+		set_last_error(ENMEA_CALLOC_FAILED);
+		GPS_LOGE("calloc nmea_info->nmea_gsv_info.sv_info failed\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+/*
+ *	参数		:	iwise_nmea_parser_t *nmea_info		I		nmea解析器数据数据存储结构
+ * 	返回		:	void
+ * 	描述		:	销毁解析器
+ * 	历史		:
+ * 	备注		: 
+ */
+void iwise_nmea_parser_destroy(iwise_nmea_parser_t *nmea_info) 
+{
+	free(tmp);
+	//GPS_LOGD("free OK\n");
+}

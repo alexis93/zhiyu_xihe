@@ -1,0 +1,13 @@
+ls /system/lib/libsensorimu.so -l
+ls /system/lib/libmlplatform.so -l
+ls /system/lib/libins.so -l
+ls /system/lib/libxihelib.so -l
+ls /system/lib/libzhiyulib.so -l
+ls /system/lib/libzy_tcp_worker.so -l 
+ls /data/zhiyu/IMU_gnss -l
+ls /data/zhiyu/udp_server -l
+ls /data/zhiyu/loc_server.conf -l
+ls /data/zhiyu/ctrl.txt -l
+ls /data/ljrublox/ctrl.txt -l
+
+ls /storage/sd_internal/log -l

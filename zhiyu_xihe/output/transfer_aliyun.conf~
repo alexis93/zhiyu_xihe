@@ -1,0 +1,8 @@
+[nmea_server]
+port = 8201
+address = 127.0.0.1
+
+[aliyun_server]
+port = 7201
+address = 121.43.234.52
+

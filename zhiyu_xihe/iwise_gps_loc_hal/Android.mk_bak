@@ -1,0 +1,55 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+# 指定源文件
+
+SRC +=$(wildcard $(LOCAL_PATH)/iwise_loc_base/Parserlib/*.c)
+SRC +=$(wildcard $(LOCAL_PATH)/iwise_loc_base/Parserlib/rcv/*.c)
+SRC +=$(wildcard $(LOCAL_PATH)/iwise_loc_base/*.c)
+SRC +=$(wildcard $(LOCAL_PATH)/iwise_loc_hardware_layer3/*.c)
+SRC +=$(wildcard $(LOCAL_PATH)/iwise_loc_hardware_layer3/rcv/*.c)
+SRC +=$(wildcard $(LOCAL_PATH)/iwise_loc_handle_layer2/*.c)
+SRC +=$(wildcard $(LOCAL_PATH)/iwise_loc_interface_layer1/*.c)
+
+
+SRC := $(SRC:$(LOCAL_PATH)/%=%)
+
+#$(warning $(SRC))
+
+LOCAL_SRC_FILES := iwise_loc_hal.c  
+LOCAL_SRC_FILES += $(SRC)
+
+
+
+LOCAL_C_INCLUDES += $(LOCAL_PATH)
+
+LOCAL_SHARED_LIBRARIES := \
+	liblog	\
+	libutils	\
+	libcutils  \
+	libxihelib
+
+LOCAL_MODULE_TAGS:= optional 
+
+# 编译宏说明
+# ANDROID_HAL 控制GPS_LOG的输出机制，
+#		打开则调用Android的日志机制，可通过adb logcat 查看日志，用于驱动
+#		关闭则调用printf在终端输出，一般用于可执行文件
+#
+# UBLOX 指定芯片为ublox NOVATEL指定芯片为 novatel， 两者必须传一个
+#
+# WRITE_LOG 控制是否写日志到文件， 驱动版本关闭该宏
+#
+# DATA控制log日志的存放位置，若定义可DATA,则存放在/data/log/
+# 否则存放在/storage/sd_internal/log/
+# 如果是驱动，则日志文件只能放在/data/log/，若放在storage则会失败
+LOCAL_CFLAGS+= -DANDROID_HAL -DUBLOX 
+
+# 指定输出文件名
+LOCAL_MODULE := gps.tiny4412
+
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+
+# 表明要编译成一个可执行文件
+include $(BUILD_SHARED_LIBRARY)

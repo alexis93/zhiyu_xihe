@@ -1,0 +1,14 @@
+ls /system/lib/libsensorimu.so
+ls /system/lib/libmlplatform.so
+ls /system/lib/libins.so
+ls /system/lib/libxihelib.so
+ls /system/lib/libzhiyulib.so
+ls /system/lib/libzy_tcp_worker.so 
+ls /data/zhiyu/IMU_gnss
+ls /data/zhiyu/loc_server.conf
+ls /data/zhiyu/ctrl.txt
+ls /data/ljrublox/ctrl.txt
+
+mkdir /storage/sd_internal/log
+mkdir /storage/sd_internal/log/ublox
+mkdir /storage/sd_internal/log/novatel

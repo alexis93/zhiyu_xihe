@@ -1,0 +1,9 @@
+./udp_server &
+./gnss_service_list &
+./IMU_gnss &
+./gnss_tran_pos &
+./gnss_tran_pos_wuxi &
+./tongxun2 &
+./GpsTo433Client &
+
+

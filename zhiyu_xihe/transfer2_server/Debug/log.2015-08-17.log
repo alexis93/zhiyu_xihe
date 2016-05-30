@@ -1,0 +1,28 @@
+2015-08-17 14:04:11 INFO [26935:../src/transfer.c:173] Try to connect gnss tcp server
+2015-08-17 14:04:11 INFO [26935:../src/transfer.c:63] Try to connect data source server
+2015-08-17 14:04:11 INFO [26935:../src/transfer.c:108] listen data source server success
+2015-08-17 14:04:11 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:12 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:13 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:14 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:15 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:16 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:17 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:18 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:19 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:20 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:21 INFO [26935:../src/transfer.c:128] -1,accept data source server success
+2015-08-17 14:04:21 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:22 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:23 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:24 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:25 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:26 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:27 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:28 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:29 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:30 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:31 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:32 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:33 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server
+2015-08-17 14:04:34 WARN [26935:../src/transfer.c:193] Can't connect to gnss tcp server

@@ -1,0 +1,44 @@
+2015-07-06 15:23:50 INFO [13512:../src/transfer.c:262] Try to connect gnss tcp server
+2015-07-06 15:23:50 INFO [13512:../src/transfer.c:162] Try to connect data source server
+2015-07-06 15:23:50 INFO [13512:../src/transfer.c:191] Connect data source server success
+2015-07-06 15:23:53 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:23:54 INFO [13512:../src/transfer.c:230] Read 324 bytes from data source server
+2015-07-06 15:23:55 INFO [13512:../src/transfer.c:230] Read 324 bytes from data source server
+2015-07-06 15:23:56 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:23:57 INFO [13512:../src/transfer.c:230] Read 324 bytes from data source server
+2015-07-06 15:23:58 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:23:59 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:00 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:01 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:02 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:03 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:04 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:05 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:06 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:07 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:08 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:09 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:10 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:11 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:15 INFO [13512:../src/transfer.c:230] Read 948 bytes from data source server
+2015-07-06 15:24:15 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:16 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:24 INFO [13512:../src/transfer.c:230] Read 2184 bytes from data source server
+2015-07-06 15:24:24 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:24:25 INFO [13512:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:29:46 INFO [13659:../src/transfer.c:262] Try to connect gnss tcp server
+2015-07-06 15:29:46 INFO [13659:../src/transfer.c:162] Try to connect data source server
+2015-07-06 15:29:46 INFO [13659:../src/transfer.c:191] Connect data source server success
+2015-07-06 15:29:46 INFO [13659:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:29:47 INFO [13659:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:29:48 INFO [13659:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:29:49 INFO [13659:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:29:50 INFO [13659:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:29:51 INFO [13659:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:29:52 INFO [13659:../src/transfer.c:230] Read 312 bytes from data source server
+2015-07-06 15:41:18 INFO [13748:../src/transfer.c:262] Try to connect gnss tcp server
+2015-07-06 15:41:18 INFO [13748:../src/transfer.c:162] Try to connect data source server
+2015-07-06 15:41:18 INFO [13748:../src/transfer.c:191] Connect data source server success
+2015-07-06 15:41:18 INFO [13748:../src/transfer.c:230] Read 324 bytes from data source server
+2015-07-06 15:41:19 INFO [13748:../src/transfer.c:230] Read 324 bytes from data source server
+2015-07-06 15:41:20 INFO [13748:../src/transfer.c:230] Read 324 bytes from data source server

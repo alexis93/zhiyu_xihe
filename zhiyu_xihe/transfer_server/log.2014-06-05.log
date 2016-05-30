@@ -1,0 +1,351 @@
+2014-06-05 13:57:46 INFO [8019:../src/transfer.c:209] Try to connect gnss tcp server
+2014-06-05 13:57:46 INFO [8019:../src/transfer.c:110] Try to connect data source server
+2014-06-05 13:58:07 WARN [8019:../src/transfer.c:129] Can't connect to data source server
+2014-06-05 13:59:18 INFO [8075:../src/transfer.c:209] Try to connect gnss tcp server
+2014-06-05 13:59:18 INFO [8075:../src/transfer.c:110] Try to connect data source server
+2014-06-05 13:59:23 INFO [8075:../src/transfer.c:139] Connect data source server success
+2014-06-05 13:59:24 INFO [8075:../src/transfer.c:177] Read 348 bytes from data source server
+2014-06-05 13:59:28 INFO [8075:../src/transfer.c:177] Read 1414 bytes from data source server
+2014-06-05 13:59:29 INFO [8075:../src/transfer.c:177] Read 326 bytes from data source server
+2014-06-05 13:59:30 INFO [8075:../src/transfer.c:177] Read 348 bytes from data source server
+2014-06-05 14:00:01 INFO [8119:../src/transfer.c:210] Try to connect gnss tcp server
+2014-06-05 14:00:01 INFO [8119:../src/transfer.c:110] Try to connect data source server
+2014-06-05 14:00:03 INFO [8119:../src/transfer.c:139] Connect data source server success
+2014-06-05 14:00:04 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:06 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:07 INFO [8119:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:00:09 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:10 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:12 INFO [8119:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:00:16 INFO [8119:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:00:18 INFO [8119:../src/transfer.c:178] Read 674 bytes from data source server
+2014-06-05 14:00:19 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:21 INFO [8119:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:00:22 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:23 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:24 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:24 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:25 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:26 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:27 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:37 WARN [8119:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:00:37 INFO [8119:../src/transfer.c:178] Read 2828 bytes from data source server
+2014-06-05 14:00:38 INFO [8119:../src/transfer.c:178] Read 1000 bytes from data source server
+2014-06-05 14:00:43 INFO [8119:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:00:43 INFO [8119:../src/transfer.c:178] Read 326 bytes from data source server
+2014-06-05 14:00:44 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:46 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:47 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:47 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:49 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:53 INFO [8119:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:00:55 INFO [8119:../src/transfer.c:178] Read 674 bytes from data source server
+2014-06-05 14:00:56 INFO [8119:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:00:57 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:58 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:00:59 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:00 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:01 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:06 INFO [8119:../src/transfer.c:178] Read 1740 bytes from data source server
+2014-06-05 14:01:07 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:08 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:09 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:10 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:10 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:12 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:13 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:14 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:15 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:16 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:17 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:18 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:19 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:20 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:21 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:21 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:22 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:23 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:24 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:01:25 INFO [8119:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:03:53 INFO [8142:../src/transfer.c:210] Try to connect gnss tcp server
+2014-06-05 14:03:53 INFO [8142:../src/transfer.c:110] Try to connect data source server
+2014-06-05 14:03:53 INFO [8142:../src/transfer.c:139] Connect data source server success
+2014-06-05 14:03:54 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:03:55 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:03:56 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:03:57 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:03:57 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:03:59 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:03:59 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:03 INFO [8142:../src/transfer.c:178] Read 1044 bytes from data source server
+2014-06-05 14:04:04 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:05 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:05 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:07 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:08 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:12 INFO [8142:../src/transfer.c:178] Read 1392 bytes from data source server
+2014-06-05 14:04:12 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:14 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:15 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:16 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:17 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:22 INFO [8142:../src/transfer.c:178] Read 1392 bytes from data source server
+2014-06-05 14:04:22 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:23 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:24 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:25 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:26 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:27 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:28 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:32 INFO [8142:../src/transfer.c:178] Read 1392 bytes from data source server
+2014-06-05 14:04:32 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:38 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:04:38 INFO [8142:../src/transfer.c:178] Read 326 bytes from data source server
+2014-06-05 14:04:39 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:40 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:41 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:42 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:43 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:44 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:45 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:46 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:47 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:48 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:49 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:49 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:51 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:52 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:54 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:04:55 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:56 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:56 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:58 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:04:58 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:00 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:01 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:03 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:05:04 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:05 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:06 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:07 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:08 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:08 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:10 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:11 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:12 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:13 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:15 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:05:16 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:17 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:18 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:19 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:20 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:21 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:22 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:24 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:25 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:05:26 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:28 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:28 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:29 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:05:39 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:05:49 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:05:50 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:05:50 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:00 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:06:01 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:01 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:01 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:07 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:07 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:17 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:06:17 WARN [8142:../src/transfer.c:164] timeout four times, close socket, reconnect!
+2014-06-05 14:06:17 INFO [8142:../src/transfer.c:110] Try to connect data source server
+2014-06-05 14:06:17 INFO [8142:../src/transfer.c:112] close socket connect to data source server
+2014-06-05 14:06:20 INFO [8142:../src/transfer.c:139] Connect data source server success
+2014-06-05 14:06:30 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:06:31 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:40 INFO [8142:../src/transfer.c:178] Read 4096 bytes from data source server
+2014-06-05 14:06:40 INFO [8142:../src/transfer.c:178] Read 450 bytes from data source server
+2014-06-05 14:06:41 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:42 INFO [8142:../src/transfer.c:178] Read 1000 bytes from data source server
+2014-06-05 14:06:43 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:44 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:45 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:46 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:47 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:48 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:49 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:50 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:55 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:06:56 INFO [8142:../src/transfer.c:178] Read 674 bytes from data source server
+2014-06-05 14:06:57 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:58 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:06:59 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:00 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:01 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:03 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:04 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:05 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:06 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:08 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:09 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:07:11 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:07:13 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:07:15 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:07:17 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:21 INFO [8142:../src/transfer.c:178] Read 2088 bytes from data source server
+2014-06-05 14:07:28 INFO [8142:../src/transfer.c:178] Read 2436 bytes from data source server
+2014-06-05 14:07:29 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:30 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:31 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:32 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:33 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:34 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:36 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:36 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:37 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:38 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:39 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:40 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:41 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:42 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:43 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:44 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:45 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:46 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:47 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:48 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:49 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:50 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:50 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:52 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:52 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:54 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:07:54 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:04 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:08:06 INFO [8142:../src/transfer.c:178] Read 2828 bytes from data source server
+2014-06-05 14:08:08 INFO [8142:../src/transfer.c:178] Read 1348 bytes from data source server
+2014-06-05 14:08:09 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:09 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:10 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:11 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:12 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:13 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:14 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:19 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:08:20 INFO [8142:../src/transfer.c:178] Read 326 bytes from data source server
+2014-06-05 14:08:21 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:21 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:22 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:23 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:24 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:25 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:26 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:27 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:29 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:30 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:08:31 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:32 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:35 INFO [8142:../src/transfer.c:178] Read 1044 bytes from data source server
+2014-06-05 14:08:35 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:37 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:38 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:39 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:40 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:41 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:42 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:43 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:44 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:45 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:53 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:08:53 INFO [8142:../src/transfer.c:178] Read 1370 bytes from data source server
+2014-06-05 14:08:54 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:55 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:56 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:57 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:58 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:08:59 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:00 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:01 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:02 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:12 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:09:16 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:09:16 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:09:17 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:09:17 INFO [8142:../src/transfer.c:178] Read 978 bytes from data source server
+2014-06-05 14:09:18 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:19 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:20 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:21 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:22 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:09:32 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:09:32 WARN [8142:../src/transfer.c:164] timeout four times, close socket, reconnect!
+2014-06-05 14:09:32 INFO [8142:../src/transfer.c:110] Try to connect data source server
+2014-06-05 14:09:32 INFO [8142:../src/transfer.c:112] close socket connect to data source server
+2014-06-05 14:09:37 INFO [8142:../src/transfer.c:139] Connect data source server success
+2014-06-05 14:09:47 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:09:57 WARN [8142:../src/transfer.c:160] read from data_source_sock timeout
+2014-06-05 14:10:01 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:06 INFO [8142:../src/transfer.c:178] Read 4096 bytes from data source server
+2014-06-05 14:10:06 INFO [8142:../src/transfer.c:178] Read 146 bytes from data source server
+2014-06-05 14:10:06 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:10:06 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:10:07 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:10:07 INFO [8142:../src/transfer.c:178] Read 912 bytes from data source server
+2014-06-05 14:10:08 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:10:13 INFO [8142:../src/transfer.c:178] Read 1414 bytes from data source server
+2014-06-05 14:10:14 INFO [8142:../src/transfer.c:178] Read 326 bytes from data source server
+2014-06-05 14:10:15 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:16 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:17 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:18 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:19 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:20 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:21 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:22 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:23 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:24 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:25 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:26 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:27 INFO [8142:../src/transfer.c:178] Read 348 bytes from data source server
+2014-06-05 14:10:29 INFO [8142:../src/transfer.c:178] Read 696 bytes from data source server
+2014-06-05 14:43:47 INFO [8850:../src/transfer.c:218] Try to connect gnss tcp server
+2014-06-05 14:43:47 INFO [8850:../src/transfer.c:118] Try to connect data source server
+2014-06-05 14:43:47 INFO [8850:../src/transfer.c:147] Connect data source server success
+2014-06-05 14:43:48 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:48 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:49 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:50 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:51 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:52 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:53 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:54 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:55 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:56 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:57 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:58 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:43:59 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:01 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:01 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:02 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:03 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:04 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:05 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:07 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 14:44:07 INFO [8850:../src/transfer.c:186] Read 348 bytes from data source server
+2014-06-05 15:16:19 INFO [9047:../src/transfer.c:226] Try to connect gnss tcp server
+2014-06-05 15:16:19 INFO [9047:../src/transfer.c:126] Try to connect data source server
+2014-06-05 15:16:19 INFO [9047:../src/transfer.c:155] Connect data source server success
+2014-06-05 15:16:19 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:20 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:21 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:22 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:23 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:24 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:25 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:26 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:27 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:28 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:29 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server
+2014-06-05 15:16:30 INFO [9047:../src/transfer.c:194] Read 348 bytes from data source server

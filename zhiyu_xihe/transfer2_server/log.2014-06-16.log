@@ -1,0 +1,30 @@
+2014-06-16 14:04:55 INFO [6887:../src/transfer.c:262] Try to connect gnss tcp server
+2014-06-16 14:04:55 INFO [6887:../src/transfer.c:162] Try to connect data source server
+2014-06-16 14:04:55 INFO [6887:../src/transfer.c:191] Connect data source server success
+2014-06-16 14:04:56 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:04:57 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:04:58 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:04:59 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:00 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:01 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:02 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:03 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:04 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:05 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:06 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:07 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:08 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:09 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:10 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:11 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:12 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:13 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:14 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:15 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:16 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:17 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:18 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:19 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:20 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:21 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server
+2014-06-16 14:05:22 INFO [6887:../src/transfer.c:230] Read 360 bytes from data source server

@@ -1,0 +1,1061 @@
+/*------------------------------------------------------------------------------
+* establised by yuan
+*-----------------------------------------------------------------------------*/
+#include "rtklib.h"
+#include "iwise_loc_base.h"
+static const char rcsid[]="$Id:$";
+
+
+#define SQR(x)      ((x)*(x))
+#define MIN(x,y)    ((x)<=(y)?(x):(y))
+
+#define AS2R        (D2R/3600.0)    /* arc sec to radian */
+#define GME         3.986004415E+14 /* earth gravitational constant */
+#define GMS         1.327124E+20    /* sun gravitational constant */
+#define GMM         4.902801E+12    /* moon gravitational constant */
+
+#define MAXACC      30.0     /* max accel for doppler slip detection (m/s^2) */
+
+                                    /* initial variances */
+#define VAR_POS     SQR(100.0)      /*   receiver position (m^2) */
+#define VAR_CLK     SQR(100.0)      /*   receiver clock (m^2) */
+#define VAR_ZTD     SQR(  0.3)      /*   ztd (m^2) */
+#define VAR_GRA     SQR(0.001)      /*   gradient (m^2) */
+#define VAR_BIAS    SQR(100.0)      /*   phase-bias (m^2) */
+
+#define VAR_IONO_OFF SQR(10.0)      /* variance of iono-model-off */
+
+#define ERR_SAAS    0.3             /* saastamoinen model error std (m) */
+#define ERR_BRDCI   0.5             /* broadcast iono model error factor */
+#define ERR_CBIAS   0.3             /* code bias error std (m) */
+#define REL_HUMI    0.7             /* relative humidity for saastamoinen model */
+
+/* number of parameters (pos,ionos,tropos,hw-bias,phase-bias,real,estimated) */   //modified by yuan;
+#define NF(opt)     ((opt)->ionoopt==IONOOPT_IFLC?1:(opt)->nf)
+#define NP(opt)     ((opt)->dynamics==0?3:9)
+#define NC(opt)     (NSYS)             //added by yuan������ϵͳ�������ջ��Ӳ�;
+#define NI(opt)     ((opt)->ionoopt!=IONOOPT_EST?0:MAXSAT)
+#define NT(opt)     ((opt)->tropopt<TROPOPT_EST?0:((opt)->tropopt<TROPOPT_ESTG?1:3))
+#define NL(opt)     ((opt)->glomodear!=2?0:NFREQGLO)
+#define NB(opt)     ((opt)->mode<=PMODE_DGPS?0:MAXSAT*NF(opt))
+#define NR(opt)     (NP(opt)+NC(opt)+NI(opt)+NT(opt)+NL(opt))
+#define NX(opt)     (NR(opt)+NB(opt))
+/* state variable index */
+#define IC(s,opt)   (NP(opt)+(s))      /* state index of clocks (s=0:gps,1:glo,2:BDS) */  //���ջ��Ӳ�;
+#define II(s,opt)   (NP(opt)+NC(opt)+(s)-1)     /* ionos (s:satellite no) */    //��������;
+#define IT(opt)     (NP(opt)+NC(opt)+NI(opt)) /* tropos (r:0=rov,1:ref) */          //���������ϵ��;
+//#define IL(f,opt)   (NP(opt)+IC(1,opt)+NI(opt)+NT(opt)+(f))   /* receiver h/w bias */     //ƫ��;
+#define IB(s,opt)   (NR(opt)+(s)-1) /* phase bias s�������Ǻ� */    //ģ���Ȳ���;
+
+/* iers mean pole (ref [7] eq.7.25) ------------------------------------------*/
+static void iers_mean_pole(gtime_t tut, double *xp_bar, double *yp_bar)
+{
+    const double ep2000[]={2000,1,1,0,0,0};
+    double y,y2,y3;
+    
+    y=timediff(tut,epoch2time(ep2000))/86400.0/365.25;
+    
+    if (y<3653.0/365.25) { /* until 2010.0 */
+        y2=y*y; y3=y2*y;
+        *xp_bar= 55.974+1.8243*y+0.18413*y2+0.007024*y3; /* (mas) */
+        *yp_bar=346.346+1.7896*y-0.10729*y2-0.000908*y3;
+    }
+    else { /* after 2010.0 */
+        *xp_bar= 23.513+7.6141*y; /* (mas) */
+        *yp_bar=358.891-0.6287*y;
+    }
+}
+/* exclude meas of eclipsing satellite (block IIA) ---------------------------*/
+static void testeclipse(const obsd_t *obs, int n, const nav_t *nav, double *rs)
+{
+    double rsun[3],esun[3],r,ang,erpv[5]={0},cosa;
+    int i,j;
+    const char *type;
+    
+    //trace(3,"testeclipse:\n");
+    
+    /* unit vector of sun direction (ecef) */
+    sunmoonpos(gpst2utc(obs[0].time),erpv,rsun,NULL,NULL);
+    normv3(rsun,esun);
+    
+    for (i=0;i<n;i++) {
+		type = nav->pcvs[obs[i].sat - 1].type;
+        
+        if ((r=norm(rs+i*6,3))<=0.0) continue;
+#if 1
+        /* only block IIA */
+        if (*type&&!strstr(type,"BLOCK IIA")) continue;
+#endif
+        /* sun-earth-satellite angle */
+        cosa=dot(rs+i*6,esun,3)/r;
+        cosa=cosa<-1.0?-1.0:(cosa>1.0?1.0:cosa);
+        ang=acos(cosa);
+        
+        /* test eclipse */
+        if (ang<PI/2.0||r*sin(ang)>RE_WGS84) continue;
+        
+        for (j=0;j<3;j++) rs[j+i*6]=0.0;
+    }
+}
+/* measurement error variance ------------------------------------------------*/
+static double varerr(int sat, int sys, double el, int type, const prcopt_t *opt)
+{
+    double a,b,a2,b2,fact=1.0;
+    double sinel=sin(el);
+    int i=sys==SYS_GLO?1:(sys==SYS_GAL?2:0);
+    
+    /* extended error model */
+    if (type==1&&opt->exterr.ena[0]) { /* code */
+        a=opt->exterr.cerr[i][0];
+        b=opt->exterr.cerr[i][1];
+        if (opt->ionoopt==IONOOPT_IFLC) {
+            a2=opt->exterr.cerr[i][2];
+            b2=opt->exterr.cerr[i][3];
+            a=sqrt(SQR(2.55)*a*a+SQR(1.55)*a2*a2);
+            b=sqrt(SQR(2.55)*b*b+SQR(1.55)*b2*b2);
+        }
+    }
+    else if (type==0&&opt->exterr.ena[1]) { /* phase */
+        a=opt->exterr.perr[i][0];
+        b=opt->exterr.perr[i][1];
+        if (opt->ionoopt==IONOOPT_IFLC) {
+            a2=opt->exterr.perr[i][2];
+            b2=opt->exterr.perr[i][3];
+            a=sqrt(SQR(2.55)*a*a+SQR(1.55)*a2*a2);
+            b=sqrt(SQR(2.55)*b*b+SQR(1.55)*b2*b2);
+        }
+    }
+    else { /* normal error model */
+        if (type==1) fact*=opt->eratio[0];
+        fact*=sys==SYS_GLO?EFACT_GLO:(sys==SYS_SBS?EFACT_SBS:EFACT_GPS);
+        if (opt->ionoopt==IONOOPT_IFLC) fact*=3.0;
+        a=fact*opt->err[1];
+        b=fact*opt->err[2];
+    }
+    return a*a+b*b/sinel/sinel;
+}
+/* initialize state and covariance -------------------------------------------*/
+static void initx(rtk_t *rtk, double xi, double var, int i)
+{
+    int j;
+    rtk->x[i]=xi;
+    for (j=0;j<rtk->nx;j++) {
+        rtk->P[i+j*rtk->nx]=rtk->P[j+i*rtk->nx]=i==j?var:0.0;
+    }
+}
+/* get tgd parameter (m) -----------------------------------------------------*/
+static double gettgd(int sat, const nav_t *nav)
+{
+    int i;
+    for (i=0;i<nav->n;i++) {
+        if (nav->eph[i].sat!=sat) continue;
+        return CLIGHT*nav->eph[i].tgd[0];
+    }
+    return 0.0;
+}
+/* slant ionospheric delay ---------------------------------------------------*/
+static int corr_ion(gtime_t time, const nav_t *nav, int sat, const double *pos,
+                    const double *azel, int ionoopt, double *ion, double *var,
+                    int *brk)
+{
+#ifdef EXTSTEC
+    double rate;
+#endif
+
+	*ion=ionmodel(time,nav->ion_gps,pos,azel);
+	*var=SQR(*ion*ERR_BRDCI);
+	return 1;
+}
+/* ionosphere and antenna corrected measurements -----------------------------*/
+static int corrmeas(const obsd_t *obs, const nav_t *nav, const double *pos,
+                    const double *azel, const prcopt_t *opt,
+                    const double *dantr, const double *dants, double phw,
+                    double *meas, double *var, int *brk)   //modified by yuan, single carrier
+{
+    const double *lam=nav->lam[obs->sat-1];
+    double ion=0.0,L1,P1,PC,P1_P2,P1_C1,vari,gamma;
+    int i;
+    
+    //trace(4,"corrmeas:\n");
+    
+	meas[0] = meas[1] = meas[2] = meas[3] = var[0] = var[1] = 0.0;
+    
+    /* iono-free LC */
+    //if (opt->ionoopt==IONOOPT_IFLC) {
+    //    return ifmeas(obs,nav,azel,opt,dantr,dants,phw,meas,var);
+    //}
+    if (lam[0]==0.0||obs->L[0]==0.0||obs->P[0]==0.0) return 0;
+    
+    if (testsnr(0,0,azel[1],obs->SNR[0]*0.25,&opt->snrmask)) return 0;
+    
+    L1=obs->L[0]*lam[0];
+    P1=obs->P[0];
+    
+    /* dcb correction */
+    gamma=SQR(lam[1]/lam[0]); /* f1^2/f2^2 */
+    P1_P2=nav->cbias[obs->sat-1][0];
+    P1_C1=nav->cbias[obs->sat-1][1];
+    if (P1_P2==0.0&&(satsys(obs->sat,NULL)&(SYS_GPS|SYS_GAL|SYS_QZS))) {
+        P1_P2=(1.0-gamma)*gettgd(obs->sat,nav);
+    }
+    if (obs->code[0]==CODE_L1C) P1+=P1_C1; /* C1->P1 */
+    PC=P1-P1_P2/(1.0-gamma);               /* P1->PC */
+    
+    /* slant ionospheric delay L1 (m) */
+	//if (!corr_ion(obs->time, nav, obs->sat, pos, azel, opt->ionoopt, &ion, &vari, brk)) {
+
+	//	trace(2, "iono correction error: time=%s sat=%2d ionoopt=%d\n",
+	//		time_str(obs->time, 2), obs->sat, opt->ionoopt);
+	//	return 0;
+	//}
+	/* ionospheric corrections */
+	if (!ionocorr(obs->time, nav, obs->sat, pos, azel,
+		0 > 0 ? opt->ionoopt : IONOOPT_BRDC, &ion, &vari)) return 0;
+    /* ionosphere and windup corrected phase and code */
+    meas[0]=L1/*+ion*/-lam[0]*phw;
+	meas[1] =PC /*- ion*/;   //modified by yuan, single carrier;
+	meas[2] = ion;
+	meas[3] = vari;        //modified by yuan;
+    
+    var[0]+=vari;
+    var[1]+=vari+SQR(ERR_CBIAS);
+    
+    /* antenna phase center variation correction */
+    //for (i=0;i<2;i++) {
+    //    if (dants) meas[i]-=dants[0];
+    //    if (dantr) meas[i]-=dantr[0];
+    //}
+    return 1;
+}
+/* L1/L2 geometry-free phase measurement -------------------------------------*/
+static double gfmeas(const obsd_t *obs, const nav_t *nav)
+{
+    const double *lam=nav->lam[obs->sat-1];
+    
+    if (lam[0]==0.0||lam[1]==0.0||obs->L[0]==0.0||obs->L[1]==0.0) return 0.0;
+    
+    return lam[0]*obs->L[0]-lam[1]*obs->L[1];
+}
+/* temporal update of position -----------------------------------------------*/
+static void udpos_ppp(rtk_t *rtk)
+{
+    int i;
+    
+    //trace(3,"udpos_ppp:\n");
+    
+    /* fixed mode */
+    if (rtk->opt.mode==PMODE_PPP_FIXED) {
+        for (i=0;i<3;i++) initx(rtk,rtk->opt.ru[i],1E-8,i);
+        return;
+    }
+    /* initialize position for first epoch */
+    if (norm(rtk->x,3)<=0.0) {
+        for (i=0;i<3;i++) 
+			initx(rtk,rtk->sol.rr[i],VAR_POS,i);
+    }
+    /* static ppp mode */
+    if (rtk->opt.mode==PMODE_PPP_STATIC) return;
+    
+    /* kinmatic mode without dynamics */
+    for (i=0;i<3;i++) {
+		initx(rtk, rtk->sol.rr[i], VAR_POS / 1000, i);
+    }
+}
+/* temporal update of clock --------------------------------------------------*/
+static void udclk_ppp(rtk_t *rtk)
+{
+    double dtr;
+    int i;
+    
+    //trace(3,"udclk_ppp:\n");
+    
+    /* initialize every epoch for clock (white noise) */
+    for (i=0;i<NSYS;i++) {
+        if (rtk->opt.sateph==EPHOPT_PREC) {
+            /* time of prec ephemeris is based gpst */
+            /* negelect receiver inter-system bias  */
+            dtr=rtk->sol.dtr[0];
+        }
+        else {
+            dtr=i==0?rtk->sol.dtr[0]:rtk->sol.dtr[0]+rtk->sol.dtr[i]; 
+        }
+		initx(rtk, CLIGHT*dtr, VAR_CLK / 1000, IC(i, &rtk->opt));
+    }
+}
+/* temporal update of tropospheric parameters --------------------------------*/
+static void udtrop_ppp(rtk_t *rtk)
+{
+    double pos[3],azel[]={0.0,PI/2.0},ztd,var;
+    int i=IT(&rtk->opt),j;
+    
+    //trace(3,"udtrop_ppp:\n");
+    
+    if (rtk->x[i]==0.0) {
+        ecef2pos(rtk->sol.rr,pos);
+        ztd=sbstropcorr(rtk->sol.time,pos,azel,&var);
+        initx(rtk,ztd,var,i);
+        
+        if (rtk->opt.tropopt>=TROPOPT_ESTG) {
+            for (j=0;j<2;j++) initx(rtk,1E-6,VAR_GRA,++i);
+        }
+    }
+    else {
+        rtk->P[i*(1+rtk->nx)]+=SQR(rtk->opt.prn[2])*fabs(rtk->tt)*1000;   //���Ϲ�������;
+        
+        if (rtk->opt.tropopt>=TROPOPT_ESTG) {
+            for (j=0;j<2;j++) {
+                rtk->P[++i*(1+rtk->nx)]+=SQR(rtk->opt.prn[2]*0.1)*fabs(rtk->tt);
+            }
+        }
+    }
+}
+
+//added by yuan, ���ڵ��������ĸ���;
+static void udion_ppp(rtk_t *rtk, obsd_t *obs, int n, const nav_t *nav)
+{
+	double pos[3], azel[] = { 0.0, PI / 2.0 }, ztd; double ion = 0;
+	int i = 0, j = 0; int sat = 0; double meas[4]; double var[2]; int k = 0;
+
+	//trace(3, "udtrop_ppp:\n");
+
+	for (j = 0; j < n&&j < MAXOBS; j++) {
+		sat = obs[j].sat;
+		k = II(sat, &rtk->opt);
+		if (rtk->x[II(sat, &rtk->opt)] == 0.0) {
+			ecef2pos(rtk->sol.rr, pos);
+			//i = II(sat, &rtk->opt);
+			if (!ionocorr(obs->time, nav, obs->sat, pos, azel,IONOOPT_BRDC, &ion, &var)) continue;
+			//if (!corrmeas(obs + j, nav, pos, rtk->ssat[sat - 1].azel, &rtk->opt, NULL, NULL,
+			//	0.0, meas, var, NULL)) continue;
+			initx(rtk, ion, ERR_BRDCI, II(sat, &rtk->opt));    //ÿ����Ԫ����;
+		}
+		else{
+			rtk->P[k*(1 + rtk->nx)] += SQR(rtk->opt.prn[1])*fabs(rtk->tt)*1000;   //���Ϲ�������;
+		}
+	}
+}
+
+/* detect cycle slip by doppler and phase difference -------------------------*/
+static void detslp_dop(rtk_t *rtk, const obsd_t *obs, int i, int rcv,
+	const nav_t *nav)
+{
+	/* detection with doppler disabled because of clock-jump issue (v.2.3.0) */
+#if 1
+	int f, sat = obs[i].sat;
+	double tt, dph, dpt, lam, thres;
+
+	for (f = 0; f < rtk->opt.nf; f++) {
+		if (obs[i].L[f] == 0.0 || obs[i].D[f] == 0.0 || rtk->ssat[sat - 1].ph[1][f] == 0.0) {
+			continue;
+		}
+		if (fabs(tt = timediff(obs[i].time, rtk->ssat[sat - 1].pt[1][f])) < DTTOL) continue;
+		if ((lam = nav->lam[sat - 1][f]) <= 0.0) continue;
+
+		/* cycle slip threshold (cycle) */
+		thres = 0.5*tt*tt / 2.0 / lam + rtk->opt.err[4] * fabs(tt)*4.0;
+
+		/* phase difference and doppler x time (cycle) */
+		dph = obs[i].L[f] - rtk->ssat[sat - 1].ph[1][f];
+		dpt = -obs[i].D[f] * tt;
+		if (fabs(dph) > 0.0009*CLIGHT/lam){
+			if (dph > 0.1){
+				dph -= 0.001*CLIGHT/lam;
+			}
+			if (dph < 0.1){
+				dph += 0.001*CLIGHT/lam;
+			}
+		}
+		if (fabs(dph - dpt) <= thres) continue;
+
+		rtk->ssat[sat - 1].slip[f] = 1;
+		rtk->ssat[sat - 1].ph[0][2] = 1;   //added by yuan, ���Ϊһ��ʾ����Ԫ��������;
+
+		//errmsg(rtk, "slip detected (sat=%2d rcv=%d L%d=%.3f %.3f thres=%.3f)\n",
+		//	sat, rcv, f + 1, dph, dpt, thres);
+	}
+#endif
+}
+
+/* detect cycle slip by carrier rate of change -------------------------*/
+static void detslp_carrier(rtk_t *rtk, const obsd_t *obs, int i, int epoch,
+	const nav_t *nav)
+{
+	/* detection with doppler disabled because of clock-jump issue (v.2.3.0) */
+#if 1
+	int f, sat = obs[i].sat;
+	double tt, dph, dpt, lam, thres;
+
+	//trace(3, "detslp_carrier: i=%d rcv=%d\n", i, epoch);
+
+	for (f = 0; f < rtk->opt.nf; f++) {
+		if (obs[i].L[0] == 0.0 || obs[i].D[0] == 0.0 || rtk->ssat[sat - 1].ph[1][0] == 0.0 || rtk->ssat[sat - 1].ph[2][0] == 0.0
+			|| rtk->ssat[sat - 1].ph[1][2] == 1 || rtk->ssat[sat - 1].ph[2][2] == 1) {
+			continue;
+		}
+		if (fabs(tt = timediff(obs[i].time, rtk->ssat[sat - 1].pt[1][0])) < DTTOL) continue;
+		//if ((lam = nav->lam[sat - 1][0]) <= 0.0) continue;
+		rtk->ssat[sat - 1].ph_rate[0] = (rtk->ssat[sat - 1].ph[1][0] - rtk->ssat[sat - 1].ph[2][0]) / tt;   //ǰһ����Ԫ�仯��;
+		if (fabs(rtk->ssat[sat - 1].ph_rate[0])>0.0009*CLIGHT/lam_carr[0]){
+			rtk->ssat[sat - 1].ph_rate[0] -= CLIGHT/1000/lam_carr[0];
+		}
+		rtk->ssat[sat - 1].ph_rate[1] = (obs[i].L[0] - rtk->ssat[sat - 1].ph[1][0]) / tt;      //��ǰ��Ԫ�ز��仯��;
+		if (fabs( rtk->ssat[sat - 1].ph_rate[0] ) < 0.00001) continue;
+		/* cycle slip threshold (cycle) */
+		thres = 5 /** CLIGHT / FREQ1*/;   //����;
+
+		/* phase difference and doppler x time (cycle) */
+		dph = obs[i].L[0] ;
+		dpt = rtk->ssat[sat - 1].ph[1][0] + rtk->ssat[sat - 1].ph_rate[0] * tt;
+
+		rtk->ssat[sat - 1].ph_rate[0] = rtk->ssat[sat - 1].ph_rate[1];    //����ǰ��Ԫ�ز��仯�ʸ�ֵ;
+
+		if (fabs(dph - dpt) <= thres) continue;
+
+		rtk->ssat[sat - 1].slip[0] = 1;
+		rtk->ssat[sat - 1].ph[0][2] = 1;   //added by yuan, ���Ϊ1��ʾ����Ԫ��������;
+
+		//errmsg(rtk, "slip detected (sat=%2d rcv=%d L%d=%.3f %.3f thres=%.3f)\n",
+		//	sat, epoch, f + 1, dph, dpt, thres);
+	}
+#endif
+}
+
+/* detect cycle slip by carrier rate of change -------------------------*/
+static void detslp_ph(rtk_t *rtk, const obsd_t *obs,int i)
+{
+	/* detection with doppler disabled because of clock-jump issue (v.2.3.0) */
+	int f, sat = obs[i].sat;
+	double tt, dph, dpt, lam, thres;
+
+	//trace(3, "detslp_carrier: i=%d rcv=%d\n", i, epoch);
+
+	for (f = 0; f < rtk->opt.nf; f++) {
+		if (rtk->ssat[sat - 1].ph[0][1] == 0.0 || rtk->ssat[sat - 1].ph[1][1] == 0.0 || rtk->ssat[sat - 1].ph[2][1] == 0.0
+			|| rtk->ssat[sat - 1].ph[3][1] == 0.0 || rtk->ssat[sat - 1].ph[4][1] == 0.0) {
+			continue;
+		}
+		if (fabs(tt = timediff(obs[i].time, rtk->ssat[sat - 1].pt[1][f])) < DTTOL) continue;
+		//if ((lam = nav->lam[sat - 1][f]) <= 0.0) continue;
+		rtk->ssat[sat - 1].ca_rate[0] = (rtk->ssat[sat - 1].ph[0][1] - rtk->ssat[sat - 1].ph[1][1]) / tt;   //ǰһ����Ԫ�仯��;
+		rtk->ssat[sat - 1].ca_rate[1] = (rtk->ssat[sat - 1].ph[1][1] - rtk->ssat[sat - 1].ph[2][1]) / tt;      //��ǰ��Ԫ�ز��仯��;
+		rtk->ssat[sat - 1].ca_rate[2] = (rtk->ssat[sat - 1].ph[2][1] - rtk->ssat[sat - 1].ph[3][1]) / tt;   //ǰһ����Ԫ�仯��;
+		rtk->ssat[sat - 1].ca_rate[3] = (rtk->ssat[sat - 1].ph[3][1] - rtk->ssat[sat - 1].ph[4][1]) / tt;      //��ǰ��Ԫ�ز��仯��;
+		if (fabs(rtk->ssat[sat - 1].ca_rate[0] - rtk->ssat[sat - 1].ca_rate[1]) > 5 &&
+			fabs(rtk->ssat[sat - 1].ca_rate[0] - rtk->ssat[sat - 1].ca_rate[1]) < CLIGHT / 100000) {
+			//�������α�����䣬���޳���Ӧ���ǣ���Ҫ�ų����ջ����������;
+			rtk->opt.exsats[sat - 1] = 1;
+		}
+		
+	}
+}
+
+
+//added by yuan, ����̽�⣬���ջ�����̽�����޸�;
+extern int detect_ppp(rtk_t *rtk, obsd_t *obs, int n, const nav_t *nav)
+{
+	double meas[4], var[2], bias[MAXOBS] = { 0 }, offset = 0.0, pos[3] = { 0 };
+	int i = 0, j = 0, k = 0, sat = 0, brk = 0; int Js = 0;
+	const double *lam = NULL;    //added by yuan;
+	int temp = 0;   //������¼������Ԫ��ͬ���Ǹ���;
+	int mark = 0;   //
+
+	//trace(3,"udbias  : n=%d\n",n);
+
+	for (i = 0; i < MAXSAT; i++) for (j = 0; j < NFREQ; j++) {
+		rtk->ssat[i].slip[j] = 0;
+	}
+	//added by yuan;
+	for (i = 0; i < n&&i < MAXOBS; i++){
+		sat = obs[i].sat;
+		rtk->ssat[sat - 1].slip[0] = 0;   //�������ֵ��ÿ�ζ���ʼ��һ��;
+		lam = nav->lam[sat - 1];    //�ز�������ÿ�ζ�����һ��
+
+		rtk->ssat[sat - 1].ph[4][0] = rtk->ssat[sat - 1].ph[3][0];    //�ز���λ�۲�ֵ;
+		rtk->ssat[sat - 1].ph[4][1] = rtk->ssat[sat - 1].ph[3][1];    //α��۲�ֵ;
+		rtk->ssat[sat - 1].ph[4][3] = rtk->ssat[sat - 1].ph[3][3];    //��������������;
+		//rtk->ssat[sat - 1].ph[j][4] = rtk->ssat[sat - 1].ph[3][4];    //���ջ��������;
+		rtk->ssat[sat - 1].ph[4][2] = rtk->ssat[sat - 1].ph[3][2];    //������Ǹ�ֵ;
+		rtk->ssat[sat - 1].pt[4][0] = rtk->ssat[sat - 1].pt[3][0];    //ʱ��;
+
+		rtk->ssat[sat - 1].ph[3][0] = rtk->ssat[sat - 1].ph[2][0];    //�ز���λ�۲�ֵ;
+		rtk->ssat[sat - 1].ph[3][1] = rtk->ssat[sat - 1].ph[2][1];    //α��۲�ֵ;
+		rtk->ssat[sat - 1].ph[3][3] = rtk->ssat[sat - 1].ph[2][3];    //��������������;
+		//rtk->ssat[sat - 1].ph[j][4] = rtk->ssat[sat - 1].ph[2][4];    //���ջ��������;
+		rtk->ssat[sat - 1].ph[3][2] = rtk->ssat[sat - 1].ph[2][2];    //������Ǹ�ֵ;
+		rtk->ssat[sat - 1].pt[3][0] = rtk->ssat[sat - 1].pt[2][0];    //ʱ��;
+
+		rtk->ssat[sat - 1].ph[2][0] = rtk->ssat[sat - 1].ph[1][0];    //�ز���λ�۲�ֵ;
+		rtk->ssat[sat - 1].ph[2][1] = rtk->ssat[sat - 1].ph[1][1];    //α��۲�ֵ;
+		rtk->ssat[sat - 1].ph[2][3] = rtk->ssat[sat - 1].ph[1][3];    //��������������;
+		//rtk->ssat[sat - 1].ph[j][4] = rtk->ssat[sat - 1].ph[1][4];    //���ջ��������;
+		rtk->ssat[sat - 1].ph[2][2] = rtk->ssat[sat - 1].ph[1][2];    //������Ǹ�ֵ;
+		rtk->ssat[sat - 1].pt[2][0] = rtk->ssat[sat - 1].pt[1][0];    //ʱ��;
+
+		rtk->ssat[sat - 1].ph[1][0] = rtk->ssat[sat - 1].ph[0][0];    //�ز���λ�۲�ֵ;
+		rtk->ssat[sat - 1].ph[1][1] = rtk->ssat[sat - 1].ph[0][1];    //α��۲�ֵ;
+		rtk->ssat[sat - 1].ph[1][3] = rtk->ssat[sat - 1].ph[0][3];    //��������������;
+		//rtk->ssat[sat - 1].ph[j][4] = rtk->ssat[sat - 1].ph[1][4];    //���ջ��������;
+		rtk->ssat[sat - 1].ph[1][2] = rtk->ssat[sat - 1].ph[0][2];    //������Ǹ�ֵ;
+		rtk->ssat[sat - 1].pt[1][0] = rtk->ssat[sat - 1].pt[0][0];    //ʱ��;
+
+		rtk->ssat[sat - 1].ph[0][0] = obs[i].L[0];
+		rtk->ssat[sat - 1].ph[0][1] = obs[i].P[0];
+		rtk->ssat[sat - 1].ph[0][3] = 0;
+		//rtk->ssat[sat - 1].ph[0][4] = 0;
+		rtk->ssat[sat - 1].ph[0][2] = 0;
+		rtk->ssat[sat - 1].pt[0][0] = obs[i].time;
+
+		rtk->ssat[sat - 1].dop = obs[i].D[0];    //�����չ۲�ֵ��ֵ;
+	}
+	//����һ��ѭ�������������;�жϣ���offset����;
+	for (i = 0; i < MAXSAT; i++) {
+		if (fabs(rtk->ssat[i].ph[0][0]) < 0.001) {
+			rtk->ssat[i].offset = 0;
+		}
+	}
+
+	//if (rtk->ssat[sat - 1].ph[1][4]){     //�����һ��Ԫ���ڽ��ջ����������޸�����Ԫ���ջ��������ٽ�������̽��;
+	for (i = 0; i < n&&i < MAXOBS; i++){
+		sat = obs[i].sat;
+		if (fabs(rtk->ssat[sat - 1].ph[1][0]) < 0.001&&fabs(rtk->ssat[sat - 1].ph[0][0]) > 0.001){
+			obs[i].kk = 1;  //��ʾ����ʧ��;
+			rtk->ssat[i].offset = 0;
+			continue;
+		}
+		if (fabs(obs[i].L[0]) < 0.001){    //�������Ԫû���ز��۲�ֵ�Ͳ����������޸�;
+			continue;
+		}
+		if (fabs(rtk->ssat[sat - 1].offset)>0.001){
+			obs[i].L[0] += (rtk->ssat[sat - 1].offset / lam_carr[0]);   //��ǰ����Ԫ�����������Ժ�ÿ����Ԫ����Ҫ���ϸ�����ֵ;
+			rtk->ssat[sat - 1].ph[0][0] = obs[i].L[0];  //�����޸�֮����ز���λֵ��ֵ���м���Ԫ;
+		}
+	}
+
+	if (rtk->counter == 0){
+		return 0;
+	}
+
+	//������̽������;
+	for (i = 0; i < n&&i < MAXOBS; i++){
+		detslp_dop(rtk, obs, i, 1, nav);
+
+	}
+	//����̽�����޸�;
+	for (i = k = 0; i < n&&i < MAXOBS; i++) {
+		//if (rtk->ssat[sat - 1].slip[0] == 1){
+		//	continue;   //�����������������ǾͲ���������̽����޸�;
+		//}
+		sat = obs[i].sat;
+		if ((!(fabs(obs[i].P[0]) < 0.1)) && (!(fabs(rtk->ssat[sat - 1].ph[1][1]) < 0.1)) &&
+			(!(fabs(obs[i].L[0]) < 0.1)) && (!(fabs(rtk->ssat[sat - 1].ph[1][0]) < 0.1))){
+			rtk->ssat[sat - 1].ph[0][3] = (obs[i].P[0] - rtk->ssat[sat - 1].ph[1][1]) -
+				(obs[i].L[0] - rtk->ssat[sat - 1].ph[1][0])*lam[0];
+
+			obs[i].mark_++;
+		}
+		else{
+			obs[i].mark  = 1;  //��ʾ����ʧ��;
+			obs[i].mark_ = 0;  //����������־;
+			mark++;
+			continue;     //������¼��ϵ����ǵĻ��Ͳ�������һ����������;
+		}
+		temp++;   //���������Ԫ����ͬ���ǣ��ͼ�1;
+		if (fabs(rtk->ssat[sat - 1].ph[0][3])>(0.00098*CLIGHT)/* && fabs(rtk->ssat[sat - 1].ph[0][3])<(0.0010001*CLIGHT)&& (rtk->ssat[sat].slip[0] == 0)*/)
+		{   //�������������������飬��������;
+			offset += rtk->ssat[sat - 1].ph[0][3];
+			k++;
+		}
+	}
+	if ( (k ==temp) && (k==(n-mark)) )    //temp==k��ʾ���пɼ����Ƕ�����һ����Ľ�Ծ����������������Ľ�Ծ��������;
+	{
+		j = 0;
+		offset = 1000 * offset / (k*CLIGHT);  //�Ŵ�һǧ���Ľ��ջ��Ӳ�������䣬1��ʾ1����;
+		//Js = offset;
+		//Js = (int)offset;   //����ȡ��;
+		if (offset>0){
+			offset += 0.5;
+			Js = (int)offset;   //����ȡ��;
+			//Js = 1;
+		} 
+		else if (offset<0){
+			offset -= 0.5;
+			Js = (int)offset;   //����ȡ��;
+			//Js = -1;
+		}
+		//if (fabs(offset - Js)<0.00001){
+		for (i = 0; i<MAXSAT; i++){
+			sat = obs[i].sat;
+			j = IB(sat, &rtk->opt);
+			//if ((fabs(rtk->x[j]) > 0.0001) /*&& (fabs(rtk->ssat[sat - 1].dop) > 0.0001)*/)
+				rtk->ssat[sat - 1].offset += Js*CLIGHT / 1000/*(rtk->ssat[sat - 1].dop*(-CLIGHT) / lam[0])*Js / 1000 +*/;   //�޸����ջ�����;
+		}
+		rtk->detect = rtk->detect_s = 1;      //���Ϊ1��ʾ����Ԫ���ڽ��ջ�����;
+		rtk->temp_++;
+		for (i = 0; i < n&&i < MAXOBS; i++){
+			if (obs[i].kk==1){  //�����³���һ�����ǾͲ����������޸�;
+				continue;
+			}
+			sat = obs[i].sat;
+			j = IB(sat, &rtk->opt);  //ģ���Ȳ���;
+			if (fabs(obs[i].L[0]) < 0.001){    //�������Ԫû���ز��۲�ֵ�Ͳ����������޸�;
+				continue;
+			}
+			obs[i].L[0] += (rtk->ssat[sat - 1].offset / lam_carr[0]);   //�����������Ǹ���Ԫ�޸�����;
+			rtk->ssat[sat - 1].ph[0][0] = obs[i].L[0];  //�����޸�֮����ز���λֵ��ֵ���м���Ԫ;
+			obs[i].mark = 1;  //��ʾ����ʧ��;
+			obs[i].mark_ = 0;  //����������־;
+			//if (fabs(rtk->x[j]) > 0.0001){    //����ھ��ܵ��㶨λ��ʱ��Ż��õ�;
+			//	rtk->x[j] += (rtk->ssat[sat - 1].offset / lam_carr[0]);
+			//}
+		}
+		k = 0;
+	}
+
+	return 1;
+}
+
+/* temporal update of phase biases -------------------------------------------*/
+static void udbias_ppp(rtk_t *rtk,const obsd_t *obs, int n, const nav_t *nav)
+{
+    double meas[4],var[2],bias[MAXOBS]={0},offset=0.0,pos[3]={0};
+	int i = 0, j = 0, k = 0, sat = 0, brk = 0; int Js = 0;
+	const double *lam = NULL;    //added by yuan;
+	int temp = 0;   //������¼������Ԫ��ͬ���Ǹ���;
+	//int mark = 0;   //����Ƿ��Ѿ��޸����ջ�����;
+	
+    /* reset phase-bias if expire obs outage counter */
+    for (i=0;i<MAXSAT;i++) {
+        if (++rtk->ssat[i].outc[0]>(unsigned int)rtk->opt.maxout) {
+            initx(rtk,0.0,0.0,IB(i+1,&rtk->opt));
+        }
+    }
+    ecef2pos(rtk->sol.rr,pos);
+    //disabled by yuan;
+    for (i=k=0;i<n&&i<MAXOBS;i++) {
+        sat=obs[i].sat;
+        j=IB(sat,&rtk->opt);
+        if (!corrmeas(obs+i,nav,pos,rtk->ssat[sat-1].azel,&rtk->opt,NULL,NULL,
+                      0.0,meas,var,&brk)) continue;
+        
+        if (brk) {
+            rtk->ssat[sat-1].slip[0]=1;
+            //trace(2,"%s: sat=%2d correction break\n",time_str(obs[i].time,0),sat);
+        }
+        bias[i]=meas[0]-meas[1];
+    }
+
+    for (i=0;i<n&&i<MAXOBS;i++) {
+        sat=obs[i].sat;
+        j=IB(sat,&rtk->opt);
+		if (obs[i].kk == 1) {   //�³���һ������;
+			initx(rtk, bias[i], VAR_BIAS, IB(sat, &rtk->opt));
+			continue;
+		}
+        rtk->P[j+j*rtk->nx]+=SQR(rtk->opt.prn[0])*fabs(rtk->tt)*1000;
+        
+        if (rtk->x[j]!=0.0&&
+			!rtk->ssat[sat - 1].slip[0]/*&&!rtk->ssat[sat-1].slip[1]*/) continue;   //modified by yuan, single carrier;
+        
+        if (bias[i]==0.0) continue;
+        
+        /* reinitialize phase-bias if detecting cycle slip */
+		initx(rtk, bias[i], VAR_BIAS , IB(sat, &rtk->opt));     //������������ͽ�ģ���ȳ�ʼ��;
+    }
+}
+/* temporal update of states --------------------------------------------------*/
+static void udstate_ppp(rtk_t *rtk, const obs_t *obs, int n, const nav_t *nav)
+{
+    
+    /* temporal update of position */
+    udpos_ppp(rtk);  //����ǰ��Ԫ��������ֵ����һ�μ���;
+    
+    /* temporal update of clock */
+    udclk_ppp(rtk);
+    
+    /* temporal update of tropospheric parameters */
+    if (rtk->opt.tropopt>=TROPOPT_EST) {
+        udtrop_ppp(rtk);
+    }
+
+	/* temporal update of tropospheric parameters */
+	if (rtk->opt.ionoopt == IONOOPT_EST) {   //added by yuan;
+		udion_ppp(rtk, obs, n, nav);
+	}
+
+    /* temporal update of phase-bias */
+    udbias_ppp(rtk,obs,n,nav);
+}
+/* satellite antenna phase center variation ----------------------------------*/
+static void satantpcv(const double *rs, const double *rr, const pcv_t *pcv,
+                      double *dant)
+{
+    double ru[3],rz[3],eu[3],ez[3],nadir,cosa;
+    int i;
+    
+    for (i=0;i<3;i++) {
+        ru[i]=rr[i]-rs[i];
+        rz[i]=-rs[i];
+    }
+    if (!normv3(ru,eu)||!normv3(rz,ez)) return;
+    
+    cosa=dot(eu,ez,3);
+    cosa=cosa<-1.0?-1.0:(cosa>1.0?1.0:cosa);
+    nadir=acos(cosa);
+    
+    antmodel_s(pcv,nadir,dant);
+}
+/* precise tropospheric model ------------------------------------------------*/
+static double prectrop(gtime_t time, const double *pos, const double *azel,
+                       const prcopt_t *opt, const double *x, double *dtdx,
+                       double *var)
+{
+    const double zazel[]={0.0,PI/2.0};
+    double zhd,m_h,m_w,cotz,grad_n,grad_e;
+    
+    /* zenith hydrostatic delay */
+    zhd=tropmodel(time,pos,zazel,0.0);
+    
+    /* mapping function */
+    m_h=tropmapf(time,pos,azel,&m_w);
+    
+    if ((opt->tropopt==TROPOPT_ESTG||opt->tropopt==TROPOPT_CORG)&&azel[1]>0.0) {
+        
+        /* m_w=m_0+m_0*cot(el)*(Gn*cos(az)+Ge*sin(az)): ref [6] */
+        cotz=1.0/tan(azel[1]);
+        grad_n=m_w*cotz*cos(azel[0]);
+        grad_e=m_w*cotz*sin(azel[0]);
+        m_w+=grad_n*x[1]+grad_e*x[2];
+        dtdx[1]=grad_n*(x[0]-zhd);
+        dtdx[2]=grad_e*(x[0]-zhd);
+    }
+    dtdx[0]=m_w;
+    *var=SQR(0.01);
+    return m_h*zhd+m_w*(x[0]-zhd);
+}
+//added by yuan, �����ͶӰ������SLMģ��;
+static double ion_(double z)
+{
+	/*double f = 0; double sinZ = 0;
+	double R = 6371.0; double H = 506.7; double r = 0.9782;
+	sinZ = (R / (R + H))*sin(r*z);
+	f = 1 / sqrt(1 - sinZ*sinZ);
+	return f;*/
+	double f = 0; double q = 0;
+	double R = 6368; double H = 350;  //��λ��ǧ��;
+	q = (R / (R + H))*sin(z);
+	f = 1 / sqrt(1 - q*q);
+	return f;
+}
+/* phase and code residuals --------------------------------------------------*/
+static int res_ppp(int iter, const obsd_t *obs, int n, const double *rs,
+                   const double *dts, const double *vare, const int *svh,
+                   const nav_t *nav, const double *x, rtk_t *rtk, double *v,
+                   double *H, double *R, double *azel)
+{
+    prcopt_t *opt=&rtk->opt;
+    double r,rr[3],disp[3],pos[3],e[3],meas[4],dtdx[3],dantr[NFREQ]={0};
+    double dants[NFREQ]={0},var[MAXOBS*2],dtrp=0.0,vart=0.0,varm[2]={0};
+    int i,j,k,sat,sys,nv=0,nx=rtk->nx,brk,tideopt;
+
+	double z = 0; double F_z = 0; double varm_t[2] = { 0 }; int nv_t = n * 2; int sat1 = 0; int sat2 = 0;
+	unsigned char satttt = 5;
+    
+    for (i=0;i<MAXSAT;i++) rtk->ssat[i].vsat[0]=0;
+	for (i = 0; i<MAXOBS * 2; i++) var[i] = 0;
+    
+    for (i=0;i<3;i++) rr[i]=x[i];
+	for (i = 0; i<4; i++) meas[i] = 0;
+
+    ecef2pos(rr,pos);
+    
+    for (i=0;i<n&&i<MAXOBS;i++) {
+
+		if (obs[i].sat>32){   //added by yuan;
+			continue;
+		}
+		//���������ز�����α��Ͳ�����������ǵķ���;
+		//if ((fabs(obs[i].L[0]) < 0.0001) || (fabs(obs[i].P[0]) < 0.0001)){
+		//	continue;
+		//}
+
+        sat=obs[i].sat;
+        if (!(sys=satsys(sat,NULL))||!rtk->ssat[sat-1].vs) continue;
+        
+        /* geometric distance/azimuth/elevation angle */
+        if ((r=geodist(rs+i*6,rr,e))<=0.0||
+            satazel(pos,e,azel+i*2)<opt->elmin) continue;
+
+		z = PI / 2.0 - (azel + i * 2)[1];   //�춥��;
+		F_z = ion_(z);  //�����ͶӰ������SLMģ��;
+
+        /* excluded satellite? */
+        if (satexclude(obs[i].sat,svh[i],opt)) continue;
+        
+        /* tropospheric delay correction */
+        if (opt->tropopt==TROPOPT_SAAS) {
+            dtrp=tropmodel(obs[i].time,pos,azel+i*2,REL_HUMI);
+            vart=SQR(ERR_SAAS);
+        }
+        else if (opt->tropopt==TROPOPT_SBAS) {
+            dtrp=sbstropcorr(obs[i].time,pos,azel+i*2,&vart);
+        }
+        else if (opt->tropopt==TROPOPT_EST||opt->tropopt==TROPOPT_ESTG) {
+            dtrp=prectrop(obs[i].time,pos,azel+i*2,opt,x+IT(opt),dtdx,&vart);
+        }
+        else if (opt->tropopt==TROPOPT_COR||opt->tropopt==TROPOPT_CORG) {
+            dtrp=prectrop(obs[i].time,pos,azel+i*2,opt,x,dtdx,&vart);
+        }
+        
+        /* phase windup correction */
+        if (opt->posopt[2]) {
+            windupcorr(rtk->sol.time,rs+i*6,rr,&rtk->ssat[sat-1].phw);
+        }
+        /* ionosphere and antenna phase corrected measurements */
+        if (!corrmeas(obs+i,nav,pos,azel+i*2,&rtk->opt,dantr,dants,
+                      rtk->ssat[sat-1].phw,meas,varm,&brk)) {
+            continue;
+        }
+        /* satellite clock and tropospheric delay */
+        r+=-CLIGHT*dts[i*2]+dtrp;
+        for (j=0;j<3;j++) { /* for phase and code */
+            
+			if ( meas[j] == 0.0 ) continue;
+			if ( fabs(meas[j])<2 ) continue;
+            for (k=0;k<nx;k++) H[k+nx*nv]=0.0;
+
+			//�����α�۲ⷽ�̣�added by yuan;
+			if (j == 2){
+				//printf("%f \n", x[II(sat, opt)]);
+				v[nv] = meas[2] - F_z * x[II(sat, opt)];
+				H[II(sat, opt) + nx*nv] = F_z;
+				var[nv] = meas[2];
+				rtk->vv[nv] = v[nv];
+				nv++;
+				continue;
+			}
+			v[nv] = meas[j] - r;
+            for (k=0;k<3;k++) H[k+nx*nv]=-e[k];    //��ά����ϵ��;
+            
+			if (sys == SYS_GPS) {
+                v[nv]-=x[IC(0,opt)];    //GPS ���ջ��Ӳ�ϵ��;
+                H[IC(0,opt)+nx*nv]=1.0;
+            }
+			else if (sys == SYS_GLO){
+                v[nv]-=x[IC(1,opt)];   //GLONASS���ջ��Ӳ�ϵ��;
+                H[IC(1,opt)+nx*nv]=1.0;
+            }
+			else if (sys == SYS_CMP){
+				v[nv] -= x[IC(1, opt)];   //BDS���ջ��Ӳ�ϵ��;
+				H[IC(2, opt) + nx*nv] = 1.0;
+			}
+            if (opt->tropopt>=TROPOPT_EST) {   //���������ϵ��;
+                for (k=0;k<(opt->tropopt>=TROPOPT_ESTG?3:1);k++) {
+                    H[IT(opt)+k+nx*nv]=dtdx[k];
+                }
+            }
+			if (opt->ionoopt == IONOOPT_EST){
+				if (j==0){
+					v[nv] += F_z * x[II(sat, opt)];
+					H[II(sat, opt) + nx*nv] = -F_z;         //�ز������ϵ��;
+				} 
+				else if (j==1){
+					v[nv] -= F_z * x[II(sat, opt)];
+					H[II(sat, opt) + nx*nv] = +F_z;         //α������ϵ��;
+				}
+				
+			}
+			if (j == 0) {
+				v[nv] -= x[IB(obs[i].sat, opt)];
+				H[IB(obs[i].sat,opt)+nx*nv]=1.0;
+				var[nv] =  varerr(obs[i].sat, sys, azel[1 + i * 2], 0, opt);
+			}
+			else if( j==1 ){
+				var[nv] = varerr(obs[i].sat, sys, azel[1 + i * 2], 1, opt) ;
+			}
+            
+			rtk->sat_[nv] = obs[i].sat;  //added by yuan;
+
+            if (j==0) rtk->ssat[sat-1].resc[0]=v[nv];
+            else      rtk->ssat[sat-1].resp[0]=v[nv];
+            
+            /* test innovation */
+            //modified by yuan
+			if (fabs(v[nv]) > 0.001*CLIGHT*0.9&&v[nv] > 0.1){
+				v[nv] -= 0.001*CLIGHT;
+			}
+			if (fabs(v[nv]) > 0.0009*CLIGHT&&v[nv] < 0.1){
+				v[nv] += 0.001*CLIGHT;
+			}
+            if (opt->maxinno>0.0&&fabs(v[nv])>opt->maxinno) {
+                rtk->ssat[sat-1].rejc[0]++;
+                continue;
+            }
+            if (j==0) rtk->ssat[sat-1].vsat[0]=1;
+			rtk->vv[nv] = v[nv];
+            nv++;
+			if (j == 0) {
+				sat1++;
+			}
+			else if (j == 1){
+				sat2++;
+			}
+        }
+    }
+    for (i=0;i<nv;i++) for (j=0;j<nv;j++) {
+		R[i + j*nv] = i == j ? var[i] : 0.0;
+		
+    }
+	rtk->sat_p = sat2;   //α��;
+	rtk->sat_c = sat1;   //�ز�;
+    return nv;
+}
+
+/* number of estimated states ------------------------------------------------*/
+extern int pppnx(const prcopt_t *opt)
+{
+    return NX(opt);
+}
+//�����ʼ��;
+int initmat(double *A,  int n, int m)
+{
+	int i = 0; int j = 0;
+	for (i = 0; i < n; i++){
+		for (j = 0; j < m; j++){
+			A[i + j*n] = 0;
+		}
+	}
+}
+/* precise point positioning -------------------------------------------------*/
+extern void pppos(const obsd_t *obs, int n, const nav_t *nav, rtk_t *rtk)
+{
+	const prcopt_t *opt = &rtk->opt;
+    int i,nv,info,svh[MAXOBS],stat=SOLQ_SINGLE;
+	int j = 0; int k = 0; 
+	int k0 = 2, k1 = 5; int p = 0;
+	double rms = 0, RMS = 0;
+	int nv_ = 0; int kk = 0; double temp = 0;
+	double rs[6 * MAXOBS_]; double dts[2 * MAXOBS_]; double var[1 * MAXOBS_]; double azel[2 * MAXOBS_];
+	double xp[1 * 135]; double Pp[135 * 135];
+	double v[MAXOBS_ * 1 * 3]; double H[MAXOBS_ * 135]; double R[MAXOBS_ * MAXOBS_];
+	for (i=0;i<MAXSAT;i++) rtk->ssat[i].fix[0]=0;
+	initmat(rs, MAXOBS_, 6); initmat(dts, MAXOBS_, 2); initmat(var, MAXOBS_, 1); initmat(azel, MAXOBS_, 2);
+	initmat(xp, 135, 1); initmat(Pp, 135, 135);
+	initmat(v, MAXOBS_, 3); initmat(H, MAXOBS_, 135); initmat(R, MAXOBS_, MAXOBS_);
+    
+    /* temporal update of states */
+    udstate_ppp(rtk,obs,n,nav); //��ʹû�о�������Ҳ���Խ����ز��Լ�α��ĸ�ֵ;
+    
+    /* satellite positions and clocks */
+	satposs(obs[0].time, obs, n, nav, rtk->opt.sateph, rs, dts, var, svh);
+    
+    /* exclude measurements of eclipsing satellite */
+    if (rtk->opt.posopt[3]) {
+		testeclipse(obs, n, nav, rs);
+    }
+	matcpy(xp, rtk->x, rtk->nx, 1); nv = n*rtk->opt.nf * 3; //p = n*rtk->opt.nf * 3;    //�ز���α��;
+	/* measurement update */
+	matcpy(Pp, rtk->P, rtk->nx, rtk->nx);
+    //����Kalman�˲�;
+	rtk->opt.niter = 1;
+    for (i=0;i<rtk->opt.niter;i++) {
+        
+        /* phase and code residuals */
+        if ((nv=res_ppp(i,obs,n,rs,dts,var,svh,nav,xp,rtk,v,H,R,azel))<=0) break;
+		
+		//added by yuan, ̽��С�ֲ�;
+		if (i>=0){
+			temp = fabs(v[0]);
+			for (j = 0; j < nv; j++){
+				if (temp <= fabs(v[j])){
+					temp = fabs(v[j]);
+					kk = j;
+				}
+				//printf("%f ", v[j]);
+			}
+			//printf("\n");
+			if (fabs(v[kk]) > k1){
+				R[kk + kk*nv] = 10000000000;     //����в�ϴ�ͽ��۲ⷽ��Э������󣬽�����Է��̵�Ӱ��;
+			}
+			else if ((fabs(v[kk]) > k0) && (fabs(v[kk]) < k1)){
+				R[kk + kk*nv] = R[kk + kk*nv] * fabs(v[kk]) / k0 *((k1 - k0) / (k1 - fabs(v[kk])))*((k1 - k0) / (k1 - fabs(v[kk])));
+			}
+			//else R[kk + kk*nv] = R[kk + kk*nv];
+		}
+        if ((info=filter(xp,Pp,H,v,R,rtk->nx,nv))) {
+            break;
+        }
+        
+		stat=SOLQ_PPP;
+
+	}
+	if (stat==SOLQ_PPP) {
+        /* postfit residuals */
+        res_ppp(1,obs,n,rs,dts,var,svh,nav,xp,rtk,v,H,R,azel);
+        
+        /* update state and covariance matrix */
+        matcpy(rtk->x,xp,rtk->nx,1);
+        matcpy(rtk->P,Pp,rtk->nx,rtk->nx);
+        rtk->sol.ns=0;
+        for (i=0;i<n&&i<MAXOBS;i++) {
+			if (!rtk->ssat[obs[i].sat - 1].vsat[0]) continue;
+			rtk->ssat[obs[i].sat - 1].lock[0]++;
+			rtk->ssat[obs[i].sat - 1].outc[0] = 0;
+			rtk->ssat[obs[i].sat - 1].fix[0] = 4;
+            rtk->sol.ns++;
+        }
+		rtk->sol.stat=stat;
+
+		for (i=0;i<3;i++) {
+			rtk->sol.rr[i]=rtk->x[i];
+			rtk->sol.qr[i]=(float)rtk->P[i+i*rtk->nx];
+		}
+		rtk->sol.qr[3]=(float)rtk->P[1];
+		rtk->sol.qr[4]=(float)rtk->P[2+rtk->nx];
+		rtk->sol.qr[5]=(float)rtk->P[2];
+		rtk->sol.dtr[0]=rtk->x[IC(0,opt)];
+		rtk->sol.dtr[1]=rtk->x[IC(1,opt)]-rtk->x[IC(0,opt)];
+		for (i=0;i<n&&i<MAXOBS;i++) {
+			rtk->ssat[obs[i].sat - 1].snr[0] = MIN(obs[i].SNR[0], obs[i].SNR[1]);
+		}
+		for (i=0;i<MAXSAT;i++) {
+			if (rtk->ssat[i].slip[0]&3) rtk->ssat[i].slipc[0]++;
+		}
+
+		rtk->sol.nav = 2;   //PPP, added by yuan;
+		rtk->d       = nv/2;   //��������;
+    }
+}
+
+extern int ppp_pos_sol(const obsd_t *obs,int n , const nav_t *nav, char *msg, rtk_t *rtk)
+{
+	prcopt_t *opt = &rtk->opt;
+	sol_t solb = { { 0 } }; 
+	gtime_t time;
+	int i, nu, nr;
+	int temp=0;
+	obsd_t obs_temp[30];
+	for (i = 0; i < n; i++){
+		obs_temp[i] = obs[i];
+	}
+
+	time = rtk->sol.time; /* previous epoch */
+
+	//����̽�⣬���ջ�����̽�� ;
+	detect_ppp(rtk, obs, n, nav);   //added by yuan;
+
+	//pntpos(rtk, obs_temp,  nav, &rtk->opt, &rtk->sol, NULL, rtk->ssat, msg);
+	/* rover position by single point positioning */
+	if (!temp) {
+		return 0;
+	}
+	rtk->sol.nav = 1;  //SPP;
+	if (time.time != 0) rtk->tt = timediff(rtk->sol.time, time);
+
+	/* precise point positioning */
+	pppos(obs,n, nav,rtk);   //modified by yuan;
+	//pppoutsolstat(rtk,statlevel,fp_stat);
+	return 1;
+}
+
+
+

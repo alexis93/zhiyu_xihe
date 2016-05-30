@@ -1,0 +1,41 @@
+[channel0]
+channel_id = 0
+channel_name = car1_rtk
+rcv_server_address = 0.0.0.0
+rcv_server_port = 7201
+send_server_address = 0.0.0.0
+send_server_port = 8201
+
+[channel1]
+channel_id = 1
+channel_name = car1_gnsssinan
+rcv_server_address = 0.0.0.0
+rcv_server_port = 7202
+send_server_address = 0.0.0.0
+send_server_port = 8202
+
+[channel2]
+channel_id = 2
+channel_name = car1_gnssublox
+rcv_server_address = 0.0.0.0
+rcv_server_port = 7203
+send_server_address = 0.0.0.0
+send_server_port = 8203
+
+[channel3]
+channel_id = 3
+channel_name = car1_ublox
+rcv_server_address = 0.0.0.0
+rcv_server_port = 7204
+send_server_address = 0.0.0.0
+send_server_port = 8204
+
+[channel4]
+channel_id = 4
+channel_name = car1_ins
+rcv_server_address = 0.0.0.0
+rcv_server_port = 7205
+send_server_address = 0.0.0.0
+send_server_port = 8205
+
+

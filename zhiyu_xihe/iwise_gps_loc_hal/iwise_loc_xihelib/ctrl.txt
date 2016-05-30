@@ -1,0 +1,80 @@
++Process mode section
+#                    0: real-time mission with serial port data loading;
+#                    1: post-time mission with rinex file data loading;
+ Mode                1
+-Process mode section
+#
++Session time section
+#                    YYYY MM DD
+# From                2010 01 01
+# To                  2010 01 01
+# From                2012 12 29
+# To                  2012 12 29
+# From                2011 03 01
+# To                  2011 03 01
+# From                2013 02 08
+# To                  2013 02 08
+# From                2012 01 31
+# To                  2012 01 31
+ From                2014 05 10
+ To                  2014 05 10
+# From                2014 07 04
+# To                  2014 07 04
+-Session time section
+#
++Project directory/server section
+# item							 value                                                       ! alternative value
+ Project             E:\test\zdpos                                               ! D:\project\data\test\data\
+ Navigation          E:\test\data\eph\brdc
+ Igs clock           E:\test\data\eph\igs
+ Igs orbit           E:\test\data\eph\igs
+ Mass product        E:\test\data\eph\mass                                       ! D:\project\data\eph\mass\
+ Ionex(codg;WHUC)    E:\test\data\meteorology codg                               ! 58.49.58.148 8001
+ Rinex               E:\test\data\obs
+ Dcb                 E:\test\data\dcb                                            ! D:\project\data\test\table\
+ Table               E:\test\data\table                                          ! D:\project\data\test\table\
+ RcvInfo             rcvinfo-sd cors.txt                                                       ! rcvinfo-wk.txt
+-Project directory/server section
+#
++Solution strategy section
+# item							 value                                                       ! alternative value
+ rnxPrint            0                                                           ! 0 1
+ backward smooth     0                                                           ! 0 1
+ coordinate type     gauss_plane                                                         ! rectangular gauss_plane BLH
+ orbit               brdc                                                         ! brdc igs
+ clock               brdc                                                         ! brdc igs
+ ephemeris           brdc                                                         ! cod igs whu hzg igr gsf
+ cutoff angle        5.0
+ ratio threshold     5.0
+ use mass products   1                                                           ! 0
+ use sbas products   0 137                                                          ! 0 1
+ use qlex products   0 193																													! 0 1
+ ionosphere          NOCORRECTION                                                         ! NOCORRECTION, KLOBUCHAR, GIM, RTION
+ ion fit parameter   5
+ time of first epoch 0
+ process interval    1.0
+ amb. mov. ave.      5 60                                                        ! period (minute) and interval (second) per Mov. Ave.
+ process strategy    SHF                                                          !  SHF IDWGRID SIM
+ min latitude         60.0
+ max latitude         10.0
+ latitude step       -2.5
+ min longitude        70.0
+ max longitude        140.0
+ longitude step       5.0
+ max order            4
+ ion cutoff angle     12.0
+ ion interval         300.0
+ record interval      7200.0
+#                    0: all available
+#                    1: single frequency (code&phase)
+#										 2: all available code
+#                    3: single frequency code
+ observation to use  3
+ frequency to use    2                                                            ! 1 2 3
+ nav sys to process  G                                                           ! G(GPS) R(GLONASS) C(COMPASS/BD) M(MIXED)
+-Solution strategy section
+#
++Site section
+#name dyn bFix bAR sigP_m sigL_m sigX_m sigY_m sigZ_m bCon bPos mark_PointX_m mark_PointY_m mark_PointZ_m
+ abpo   k    0   0    0.3  0.003    5.0    5.0    5.0    0    0  4097216.6559  4429119.0324 -2065771.3413 
+-Site section

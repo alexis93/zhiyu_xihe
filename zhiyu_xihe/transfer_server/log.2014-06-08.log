@@ -1,0 +1,92 @@
+2014-06-08 08:53:14 INFO [3574:../src/transfer.c:231] Try to connect gnss tcp server
+2014-06-08 08:53:14 INFO [3574:../src/transfer.c:131] Try to connect data source server
+2014-06-08 08:53:14 INFO [3574:../src/transfer.c:160] Connect data source server success
+2014-06-08 08:53:15 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:15 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:16 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:17 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:18 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:19 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:21 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:21 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:22 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:23 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:24 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:25 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:27 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:27 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 08:53:28 INFO [3574:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-08 10:38:56 INFO [4599:../src/transfer.c:237] Try to connect gnss tcp server
+2014-06-08 10:38:56 INFO [4599:../src/transfer.c:137] Try to connect data source server
+2014-06-08 10:38:57 INFO [4599:../src/transfer.c:166] Connect data source server success
+2014-06-08 10:38:57 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:38:58 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:38:59 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:00 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:01 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:03 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:04 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:04 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:05 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:06 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:39:07 INFO [4599:../src/transfer.c:205] Read 348 bytes from data source server
+2014-06-08 10:43:38 INFO [4728:../src/transfer.c:241] Try to connect gnss tcp server
+2014-06-08 10:43:38 INFO [4728:../src/transfer.c:141] Try to connect data source server
+2014-06-08 10:43:38 INFO [4728:../src/transfer.c:170] Connect data source server success
+2014-06-08 10:43:38 INFO [4728:../src/transfer.c:209] Read 348 bytes from data source server
+2014-06-08 10:43:39 INFO [4728:../src/transfer.c:209] Read 348 bytes from data source server
+2014-06-08 10:43:41 INFO [4728:../src/transfer.c:209] Read 348 bytes from data source server
+2014-06-08 10:43:41 INFO [4728:../src/transfer.c:209] Read 348 bytes from data source server
+2014-06-08 10:43:43 INFO [4728:../src/transfer.c:209] Read 348 bytes from data source server
+2014-06-08 10:43:44 INFO [4728:../src/transfer.c:209] Read 348 bytes from data source server
+2014-06-08 10:43:44 INFO [4728:../src/transfer.c:209] Read 348 bytes from data source server
+2014-06-08 10:50:42 INFO [4867:../src/transfer.c:236] Try to connect gnss tcp server
+2014-06-08 10:50:42 INFO [4867:../src/transfer.c:136] Try to connect data source server
+2014-06-08 10:50:42 INFO [4867:../src/transfer.c:165] Connect data source server success
+2014-06-08 10:50:43 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:44 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:44 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:45 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:46 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:47 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:49 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:49 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:51 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:52 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:50:52 INFO [4867:../src/transfer.c:204] Read 348 bytes from data source server
+2014-06-08 10:58:59 INFO [5173:../src/transfer.c:251] Try to connect gnss tcp server
+2014-06-08 10:58:59 INFO [5173:../src/transfer.c:151] Try to connect data source server
+2014-06-08 10:58:59 INFO [5173:../src/transfer.c:180] Connect data source server success
+2014-06-08 10:59:00 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:00 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:02 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:02 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:04 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:04 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:05 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:07 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 10:59:07 INFO [5173:../src/transfer.c:219] Read 348 bytes from data source server
+2014-06-08 11:02:49 INFO [5258:../src/transfer.c:256] Try to connect gnss tcp server
+2014-06-08 11:02:49 INFO [5258:../src/transfer.c:156] Try to connect data source server
+2014-06-08 11:02:49 INFO [5258:../src/transfer.c:185] Connect data source server success
+2014-06-08 11:02:50 INFO [5258:../src/transfer.c:224] Read 348 bytes from data source server
+2014-06-08 11:02:50 INFO [5258:../src/transfer.c:224] Read 348 bytes from data source server
+2014-06-08 11:02:52 INFO [5258:../src/transfer.c:224] Read 348 bytes from data source server
+2014-06-08 11:02:53 INFO [5258:../src/transfer.c:224] Read 348 bytes from data source server
+2014-06-08 11:02:53 INFO [5258:../src/transfer.c:224] Read 348 bytes from data source server
+2014-06-08 11:02:54 INFO [5258:../src/transfer.c:224] Read 348 bytes from data source server
+2014-06-08 13:05:48 INFO [5807:../src/transfer.c:162] Try to connect data source server
+2014-06-08 13:05:48 INFO [5807:../src/transfer.c:262] Try to connect gnss tcp server
+2014-06-08 13:05:48 INFO [5807:../src/transfer.c:191] Connect data source server success
+2014-06-08 13:05:58 WARN [5807:../src/transfer.c:212] read from data_source_sock timeout
+2014-06-08 13:06:08 WARN [5807:../src/transfer.c:212] read from data_source_sock timeout
+2014-06-08 13:06:48 INFO [5825:../src/transfer.c:262] Try to connect gnss tcp server
+2014-06-08 13:06:48 INFO [5825:../src/transfer.c:162] Try to connect data source server
+2014-06-08 13:07:09 WARN [5825:../src/transfer.c:181] Can't connect to data source server
+2014-06-08 13:07:31 WARN [5825:../src/transfer.c:181] Can't connect to data source server
+2014-06-08 13:07:35 INFO [5825:../src/transfer.c:191] Connect data source server success
+2014-06-08 13:08:16 INFO [5875:../src/transfer.c:262] Try to connect gnss tcp server
+2014-06-08 13:08:16 INFO [5875:../src/transfer.c:162] Try to connect data source server
+2014-06-08 13:08:16 INFO [5875:../src/transfer.c:191] Connect data source server success
+2014-06-08 13:08:26 WARN [5875:../src/transfer.c:212] read from data_source_sock timeout
+2014-06-08 13:08:36 WARN [5875:../src/transfer.c:212] read from data_source_sock timeout

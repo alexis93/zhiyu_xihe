@@ -1,0 +1,39 @@
+2014-06-06 11:22:54 INFO [4603:../src/transfer.c:231] Try to connect gnss tcp server
+2014-06-06 11:22:54 INFO [4603:../src/transfer.c:131] Try to connect data source server
+2014-06-06 11:22:54 INFO [4603:../src/transfer.c:160] Connect data source server success
+2014-06-06 11:22:55 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:22:56 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:22:57 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:22:58 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:22:59 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:23:00 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:23:01 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:23:02 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:23:03 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 11:23:04 INFO [4603:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 13:09:17 INFO [5330:../src/transfer.c:154] Try to connect gnss tcp server
+2014-06-06 13:09:17 INFO [5330:../src/transfer.c:58] Try to connect data source server
+2014-06-06 13:09:17 INFO [5330:../src/transfer.c:87] Connect data source server success
+2014-06-06 13:09:17 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:18 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:19 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:20 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:21 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:22 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:23 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:24 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:09:25 INFO [5330:../src/transfer.c:123] Read 348 bytes from data source server
+2014-06-06 13:10:03 INFO [5373:../src/transfer.c:154] Try to connect gnss tcp server
+2014-06-06 13:10:03 INFO [5373:../src/transfer.c:58] Try to connect data source server
+2014-06-06 15:35:18 INFO [6147:../src/transfer.c:231] Try to connect gnss tcp server
+2014-06-06 15:35:18 INFO [6147:../src/transfer.c:131] Try to connect data source server
+2014-06-06 15:35:18 INFO [6147:../src/transfer.c:160] Connect data source server success
+2014-06-06 15:35:19 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:20 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:21 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:22 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:23 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:24 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:25 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:26 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
+2014-06-06 15:35:27 INFO [6147:../src/transfer.c:199] Read 348 bytes from data source server
